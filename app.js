@@ -4,6 +4,8 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const db = require('./utils/db');
+
 app.get('/', (req, res) => {
     res.status(200).json("Home route");
 });

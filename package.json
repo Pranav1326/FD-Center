@@ -1,0 +1,21 @@
+{
+  "name": "fd-center",
+  "version": "1.0.0",
+  "description": "To make and manage Fix Deposits",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "keywords": [
+    "fd",
+    "fd-center"
+  ],
+  "author": "Pranav1326",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0"
+  }
+}

@@ -10,4 +10,10 @@ router.post('/signup/auth', userController.varifyOtpRegister);
 // Login
 router.post('/signin', userController.login);
 
+// Update
+router.put('/update', userController.updateUser);
+
+// Delete
+router.delete('/delete', userController.deleteUser);
+
 module.exports = router;

@@ -57,6 +57,7 @@ exports.register = async (req, res) => {
     }
 }
 
+// Register Auth OTP
 exports.varifyOtpRegister = async (req, res) => {
     try {
         const userOtp = Number(req.body.otp);
@@ -79,7 +80,7 @@ exports.varifyOtpRegister = async (req, res) => {
             res.status(400).json("Invalid OTP!");
         }
     } catch (error) {
-        res.status(500);
+        res.status(500).json(error);
         console.log(error);
     }
 }
@@ -99,8 +100,56 @@ exports.login = async (req, res) => {
             userInfo,
             "RANDOM-TOKEN"
         );
-        res.status(200).json(token);
+        res.status(200).json({token});
     } catch (error) {
         console.log(error);
+        res.status(500);
+    }
+}
+
+// Update user
+exports.updateUser = async (req, res) => {
+    try {
+        const id = req.body.userId;
+        const existingUser = await User.findOne({_id: id});
+        if(!existingUser){
+            res.status(404).json("User does not exist!");
+        }
+        else{
+            const updatedUser = await User.findOneAndUpdate({_id: id}, {$set: req.body}, {new: true});
+            if(updatedUser){
+                res.status(200).json(`User updated.`);
+            }
+            else{
+                res.status(500).json("Error updating user details.");
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+    }
+}
+
+// Delete User
+exports.deleteUser = async (req, res) => {
+    try{
+        const id = req.body.userId;
+        const existingUser = await User.findOne({_id: id});
+        if(!existingUser){
+            res.status(404).json("User does not exist!");
+        }
+        else{
+            const foundUser = await User.findOneAndDelete({_id: id});
+            const wallet = await Wallet.findOneAndDelete({userId: foundUser._id});
+            if(foundUser){
+                res.status(200).json(`User ${foundUser.username} deleted!.`);
+            }
+            else{
+                res.status(500).json(`Error deleting user ${foundUser.username} details.`);
+            }
+        }
+    } catch(err){
+        console.log(err);
+        res.status(500);
     }
 }

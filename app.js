@@ -11,10 +11,13 @@ const db = require('./utils/db');
 // Routes
 const userRoute = require('./routes/user');
 const adminRoute = require('./routes/admin');
-const { json } = require('express');
+const walletRoute = require('./routes/wallet');
 
 // User Routes
 app.use('/api/user', userRoute);
+
+// Wallet Routes
+app.use('/api/wallet', walletRoute);
 
 // Admin Routes
 // app.use('/api/admin', adminRoute);

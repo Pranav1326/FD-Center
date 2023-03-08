@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const Wallet = require('../models/Wallet');
+const dotenv = require('dotenv').config();
 
 // Nodemailer
 let transporter = nodemailer.createTransport({
@@ -11,7 +12,7 @@ let transporter = nodemailer.createTransport({
     secure: true,
     auth: {
         user: "fdcenter.mernstack@gmail.com",
-        pass: "igbwlsxhnbbkojxd",
+        pass: process.env.GMAIL_KEYPASS,
     },
 });
 

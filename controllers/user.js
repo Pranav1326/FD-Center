@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const Wallet = require('../models/Wallet');
 const dotenv = require('dotenv').config();
+const userAuth = require('../middlewares/userAuth');
 
 // Nodemailer
 let transporter = nodemailer.createTransport({
@@ -29,10 +30,14 @@ const generateOtp = () => {
 exports.register = async (req, res) => {
     try {
         const isUserExist = await User.findOne({ username: req.body.username });
+        const userWithSameEmail = await User.findOne({email: req.body.email });
+        if(userWithSameEmail){
+            res.status(403).json("Email exists! Please provide different email.");
+        }
         if (isUserExist) {
             res.status(400).json("User already exist! Please Login.");
         }
-        else {
+        if(!userWithSameEmail && !isUserExist) {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(req.body.password, salt);
             const newUser = new User({
@@ -100,7 +105,7 @@ exports.login = async (req, res) => {
             userInfo,
             "RANDOM-TOKEN"
         );
-        res.status(200).json({token});
+        token && res.status(200).json({token});
     } catch (error) {
         console.log(error);
         res.status(500);
@@ -109,47 +114,59 @@ exports.login = async (req, res) => {
 
 // Update user
 exports.updateUser = async (req, res) => {
-    try {
-        const id = req.body.userId;
-        const existingUser = await User.findOne({_id: id});
-        if(!existingUser){
-            res.status(404).json("User does not exist!");
-        }
-        else{
-            const updatedUser = await User.findOneAndUpdate({_id: id}, {$set: req.body}, {new: true});
-            if(updatedUser){
-                res.status(200).json(`User updated.`);
+    const authUser = await userAuth(req);
+    if(authUser._id === req.body.userId && req.body.userId === req.params.id){
+        try {
+            const id = req.body.userId;
+            const existingUser = await User.findOne({_id: id});
+            if(!existingUser){
+                res.status(404).json("User does not exist!");
             }
             else{
-                res.status(500).json("Error updating user details.");
+                const updatedUser = await User.findOneAndUpdate({_id: id}, {$set: req.body}, {new: true});
+                if(updatedUser){
+                    res.status(200).json(`User updated.`);
+                }
+                else{
+                    res.status(500).json("Error updating user details.");
+                }
             }
+        } catch (error) {
+            console.log(error);
+            res.status(500);
         }
-    } catch (error) {
-        console.log(error);
-        res.status(500);
+    }
+    else{
+        res.status(401).json(`You can update only your account!`);
     }
 }
 
 // Delete User
 exports.deleteUser = async (req, res) => {
-    try{
-        const id = req.body.userId;
-        const existingUser = await User.findOne({_id: id});
-        if(!existingUser){
-            res.status(404).json("User does not exist!");
-        }
-        else{
-            const foundUser = await User.findOneAndDelete({_id: id});
-            const wallet = await Wallet.findOneAndDelete({userId: foundUser._id});
-            if(foundUser){
-                res.status(200).json(`User ${foundUser.username} deleted!.`);
+    const authUser = await userAuth(req);
+    if(authUser._id === req.body.userId && req.body.userId === req.params.id){
+        try{
+            const id = req.body.userId;
+            const existingUser = await User.findOne({_id: id});
+            if(!existingUser){
+                res.status(404).json("User does not exist!");
             }
             else{
-                res.status(500).json(`Error deleting user ${foundUser.username} details.`);
+                const foundUser = await User.findOneAndDelete({_id: id});
+                const wallet = await Wallet.findOneAndDelete({userId: foundUser._id});
+                if(foundUser){
+                    res.status(200).json(`User ${foundUser.username} deleted!.`);
+                }
+                else{
+                    res.status(500).json(`Error deleting user ${foundUser.username} details.`);
+                }
             }
+        } catch(err){
+            console.log(err);
+            res.status(500);
         }
-    } catch(err){
-        console.log(err);
-        res.status(500);
+    }
+    else{
+        res.status(401).json(`You can Delete only your account!`);
     }
 }

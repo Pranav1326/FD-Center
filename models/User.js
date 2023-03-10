@@ -23,6 +23,9 @@ var userSchema = new mongoose.Schema({
         type: Array,
         default: [],
     },
+    work: {
+        type: String,
+    }
 });
 
 //Export the model

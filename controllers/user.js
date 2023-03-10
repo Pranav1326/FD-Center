@@ -75,7 +75,10 @@ exports.varifyOtpRegister = async (req, res) => {
                 password: hashedPassword
             });
             const newWallet = new Wallet({
-                userId: newUser._id
+                user: {
+                    userId: newUser._id,
+                    username: newUser.username
+                }
             });
             const user = await newUser.save();
             await newWallet.save();

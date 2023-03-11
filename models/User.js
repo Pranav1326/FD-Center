@@ -25,7 +25,11 @@ var userSchema = new mongoose.Schema({
     },
     work: {
         type: String,
-    }
+    },
+    profilepic: {
+        type: String,
+        default: "",
+    },
 });
 
 //Export the model

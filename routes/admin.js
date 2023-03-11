@@ -18,6 +18,6 @@ router.post('/rate/create', auth, adminController.createRate);
 router.put('/rate/update/:rateId', auth, adminController.updateRate);
 
 // Delete Rate
-router.put('/rate/delete/:rateId', auth, adminController.deleteRate);
+router.delete('/rate/delete/:rateId', auth, adminController.deleteRate);
 
 module.exports = router;

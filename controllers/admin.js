@@ -157,10 +157,16 @@ exports.deleteRate = async (req, res) => {
     const authUser = await userAuth(req);
     if (authUser._id === req.body.userId && req.body.rateId === req.params.rateId) {
         try {
-            const updatedRate = await Rate.findOneAndDelete(
-                {_id: req.params.rateId}
-            );
-            updatedRate && res.status(200).json("Rate Deleted!");
+            const rate = await Rate.findOne({_id: req.params.rateId});
+            if(rate){
+                const updatedRate = await Rate.findOneAndDelete(
+                    {_id: req.params.rateId}
+                );
+                updatedRate && res.status(200).json("Rate Deleted!");
+            }
+            else{
+                res.status(404).json("Record not found!");
+            }
         } catch (error) {
             console.log(error);
             res.status(500);

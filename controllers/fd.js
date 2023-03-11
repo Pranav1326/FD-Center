@@ -38,6 +38,34 @@ exports.createFd = async (req, res) => {
     }
 }
 
+// Break FD
+exports.breakFd = async (req, res) => {
+    const authUser = await userAuth(req);
+    const fdId = req.body.fdId;
+    if (authUser._id === req.body.user.userId) {
+        try {
+            const fd = await Fd.findOne({ _id: fdId });
+            if(fd?.status === "running"){
+                const updateWallet = await Wallet.findOneAndUpdate({ "user.userId": req.body.user.userId },
+                    { $inc: { money: fd.amount } },
+                    { new: true }
+                );
+                const updateFd = await Fd.findOneAndUpdate({ _id: fdId }, {status: "broken"}, {new: true});
+                updateFd && res.status(200).json(updateFd);
+            }
+            else{
+                res.status(400).json("FD is not active!");
+            }
+        } catch (error) {
+            res.status(500);
+            console.log(error);
+        }
+    }
+    else {
+        res.status(401).json("Unauthorized!");
+    }
+}
+
 // Get All FDs
 exports.getAllFds = async (req, res) => {
     try {

@@ -24,7 +24,7 @@ app.use('/api/wallet', walletRoute);
 app.use('/api/fd', fdRoute);
 
 // Admin Routes
-// app.use('/api/admin', adminRoute);
+app.use('/api/admin', adminRoute);
 
 app.listen(PORT, () => {
     console.log(`Server started on http://localhost:5000`);

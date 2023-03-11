@@ -23,6 +23,7 @@ var fdSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
+        default: "running",
     },
 }, { timestamps: true });
 

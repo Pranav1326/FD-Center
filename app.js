@@ -12,12 +12,16 @@ const db = require('./utils/db');
 const userRoute = require('./routes/user');
 const adminRoute = require('./routes/admin');
 const walletRoute = require('./routes/wallet');
+const fdRoute = require('./routes/fd');
 
 // User Routes
 app.use('/api/user', userRoute);
 
 // Wallet Routes
 app.use('/api/wallet', walletRoute);
+
+// Wallet Routes
+app.use('/api/fd', fdRoute);
 
 // Admin Routes
 // app.use('/api/admin', adminRoute);

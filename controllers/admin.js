@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 const Wallet = require('../models/Wallet');
 const dotenv = require('dotenv').config();
 const userAuth = require('../middlewares/userAuth');
+const Rate = require('../models/Rate');
 
 // Nodemailer
 let transporter = nodemailer.createTransport({
@@ -30,14 +31,14 @@ const generateOtp = () => {
 exports.register = async (req, res) => {
     try {
         const isAdminExist = await Admin.findOne({ username: req.body.username });
-        const adminWithSameEmail = await Admin.findOne({email: req.body.email });
-        if(adminWithSameEmail){
+        const adminWithSameEmail = await Admin.findOne({ email: req.body.email });
+        if (adminWithSameEmail) {
             res.status(403).json("Email exists! Please provide different email.");
         }
         if (isAdminExist) {
             res.status(400).json("Admin already exist! Please Login.");
         }
-        if(!adminWithSameEmail && !isAdminExist) {
+        if (!adminWithSameEmail && !isAdminExist) {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(req.body.password, salt);
             const newAdmin = new Admin({
@@ -89,22 +90,83 @@ exports.varifyOtpRegister = async (req, res) => {
 // Login
 exports.login = async (req, res) => {
     try {
-        const admin = await Admin.findOne({username: req.body.username});
+        const admin = await Admin.findOne({ username: req.body.username });
         !admin && res.status(404).json('Admin does not exist!');
 
         const validated = await bcrypt.compare(req.body.password, admin.password);
         !validated && res.status(400).json('Wrong credentials!');
 
         // Destructuring Admin object fatched from db
-        const {password, ...adminInfo} = admin._doc;
+        const { password, ...adminInfo } = admin._doc;
         const token = jwt.sign(
             adminInfo,
             "RANDOM-TOKEN"
         );
-        token && res.status(200).json({token});
+        token && res.status(200).json({ token });
     } catch (error) {
         console.log(error);
         res.status(500);
     }
 }
 
+// Create Rate
+exports.createRate = async (req, res) => {
+    const authUser = await userAuth(req);
+    if (authUser._id === req.body.userId) {
+        try {
+            const newRate = new Rate({
+                interestRate: req.body.interestRate,
+                months: req.body.months,
+                for: req.body.for
+            });
+            await newRate.save();
+            newRate && res.status(200).json(newRate);
+        } catch (error) {
+            console.log(error);
+            res.status(500);
+        }
+    }
+    else{
+        res.status(401).json("Not Authorized!");
+    }
+}
+
+// Update Rate
+exports.updateRate = async (req, res) => {
+    const authUser = await userAuth(req);
+    if (authUser._id === req.body.userId && req.body.rateId === req.params.rateId) {
+        try {
+            const updatedRate = await Rate.findOneAndUpdate(
+                {_id: req.params.rateId},
+                {interestRate: req.body.interestRate},
+                {new: true}    
+            );
+            updatedRate && res.status(200).json(updatedRate);
+        } catch (error) {
+            console.log(error);
+            res.status(500);
+        }
+    }
+    else{
+        res.status(401).json("Not Authorized!");
+    }
+}
+
+// Delete Rate
+exports.deleteRate = async (req, res) => {
+    const authUser = await userAuth(req);
+    if (authUser._id === req.body.userId && req.body.rateId === req.params.rateId) {
+        try {
+            const updatedRate = await Rate.findOneAndDelete(
+                {_id: req.params.rateId}
+            );
+            updatedRate && res.status(200).json("Rate Deleted!");
+        } catch (error) {
+            console.log(error);
+            res.status(500);
+        }
+    }
+    else{
+        res.status(401).json("Not Authorized!");
+    }
+}

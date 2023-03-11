@@ -156,7 +156,7 @@ exports.deleteUser = async (req, res) => {
             }
             else{
                 const foundUser = await User.findOneAndDelete({_id: id});
-                const wallet = await Wallet.findOneAndDelete({userId: foundUser._id});
+                const wallet = await Wallet.findOneAndDelete({"user.userId": foundUser._id});
                 if(foundUser){
                     res.status(200).json(`User ${foundUser.username} deleted!.`);
                 }

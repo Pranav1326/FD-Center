@@ -38,7 +38,7 @@ exports.withdraw = async (req, res) => {
 exports.walletDetails = async (req, res) => {
     const userId = req.params.userId;
     try {
-        const foundWallet = await Wallet.findOne({userId})
+        const foundWallet = await Wallet.findOne({"user.userId": userId})
         .then(data => {
             res.status(200).json(data);
         })

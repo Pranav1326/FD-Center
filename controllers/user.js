@@ -173,3 +173,19 @@ exports.deleteUser = async (req, res) => {
         res.status(401).json(`You can Delete only your account!`);
     }
 }
+
+// Get User Details
+exports.getUser = async (req, res) => {
+    const userId = req.params.id;
+    try {
+        const user = await User.findOne({_id: userId});
+        !user && res.status(404).json("User not found!");
+        if(user){
+            const { password, __v, ...userInfo } = user._doc;
+            res.status(200).json(userInfo);
+        }
+    } catch (error) {
+        console.log(error);
+    console.log(userId)
+    }
+}

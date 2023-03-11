@@ -1,21 +1,20 @@
 const mongoose = require("mongoose"); // Erase if already required
 
 // Declare the Schema of the Mongo model
-const adminSchema = new mongoose.Schema({
-    username: {
-        type: String,
+const rateSchema = new mongoose.Schema({
+    interestRate: {
+        type: Number,
         required: true,
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-        type: String,
+    months: {
+        type: Number,
         required: true,
     },
-});
+    for: {
+        type: String,
+        required: true,
+    }
+}, { timestamps: true });
 
 //Export the model
-module.exports = mongoose.model("Admin", adminSchema);
+module.exports = mongoose.model("Rate", rateSchema);

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose"); // Erase if already required
 
 // Declare the Schema of the Mongo model
-var fdSchema = new mongoose.Schema({
+const fdSchema = new mongoose.Schema({
     user: {
         userId: {
             type: String,

@@ -12,6 +12,13 @@ var fdSchema = new mongoose.Schema({
             required: true,
         }
     },
+    amount: {
+        type: Number,
+        required: true,
+    },
+    months: {
+        type: Number
+    },
     matureDate: {
         type: Date,
         required: true,

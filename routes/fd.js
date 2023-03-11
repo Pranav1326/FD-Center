@@ -3,9 +3,9 @@ const fdController = require('../controllers/fd');
 const auth = require('../middlewares/auth');
 
 // Create FD
-router.get('/create', auth, fdController.createFd);
+router.post('/create', fdController.createFd);
 
 // Get All FDs
-router.get('/', auth, fdController.getAllFds);
+router.get('/', fdController.getAllFds);
 
 module.exports = router;

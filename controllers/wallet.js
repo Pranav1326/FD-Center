@@ -8,13 +8,19 @@ exports.deposit = async (req, res) => {
     const authUser = await userAuth(req);
     if (authUser._id === userId) {
         try {
-            const updateWallet = await Wallet.updateOne({ "user.userId": userId }, {
-                $inc: { money: depositAmount }
-            }).then(data => {
-                res.status(200).json("Money deposited");
-            }).catch(err => {
-                res.status(500).json(err);
-            });
+            const checkWallet = await Wallet.findOne({ "user.userId": userId });
+            if (checkWallet.money+depositAmount  <= 10000000) {
+                const updateWallet = await Wallet.updateOne({ "user.userId": userId }, {
+                    $inc: { money: depositAmount }
+                }).then(data => {
+                    res.status(200).json("Money deposited");
+                }).catch(err => {
+                    res.status(500).json(err);
+                });
+            }
+            else {
+                res.status(400).json("Deposit amount shouldn't greater than 10000000 Bucks!");
+            }
         } catch (error) {
             console.log(error);
         }
@@ -32,7 +38,7 @@ exports.withdraw = async (req, res) => {
     if (authUser._id === userId) {
         try {
             const checkWallet = await Wallet.findOne({ "user.userId": userId });
-            if (checkWallet.money > 0) {
+            if (checkWallet.money > 0 && (checkWallet.money-withdrawlAmount > 0)) {
                 const updateWallet = await Wallet.updateOne({ "user.userId": userId }, {
                     $inc: { money: -withdrawlAmount }
                 }).then(data => {

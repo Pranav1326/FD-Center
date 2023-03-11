@@ -1,10 +1,11 @@
 const router = require('express').Router();
 const fdController = require('../controllers/fd');
+const auth = require('../middlewares/auth');
 
 // Create FD
-router.get('/create', fdController.createFd);
+router.get('/create', auth, fdController.createFd);
 
 // Get All FDs
-router.get('/', fdController.getAllFds);
+router.get('/', auth, fdController.getAllFds);
 
 module.exports = router;

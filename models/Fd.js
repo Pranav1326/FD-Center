@@ -35,9 +35,6 @@ const fdSchema = new mongoose.Schema({
     maturityValue: {
         type: Number,
         required: true,
-        default: (amount, interest, months) => {
-            return (amount*(months/12)*interest)/100;
-        }
     }
 }, { timestamps: true });
 

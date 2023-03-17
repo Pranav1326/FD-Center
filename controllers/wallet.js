@@ -1,5 +1,6 @@
 const Wallet = require('../models/Wallet');
 const userAuth = require('../middlewares/userAuth');
+const Transaction = require('../models/Transaction');
 
 // Deposit
 exports.deposit = async (req, res) => {
@@ -13,13 +14,19 @@ exports.deposit = async (req, res) => {
                 const updateWallet = await Wallet.updateOne({ "user.userId": userId }, {
                     $inc: { money: depositAmount }
                 }).then(data => {
-                    res.status(200).json("Money deposited");
+                    res.status(200).json(`${depositAmount}₹ Deposited`);
                 }).catch(err => {
                     res.status(500).json(err);
                 });
+                const newTransaction = new Transaction({
+                    user: checkWallet.user,
+                    transaction: "deposit",
+                    amount: depositAmount
+                });
+                newTransaction.save();
             }
             else {
-                res.status(400).json("Deposit amount shouldn't greater than 10000000 Bucks!");
+                res.status(400).json("Deposit amount shouldn't greater than 1,00,00,000₹!");
             }
         } catch (error) {
             console.log(error);
@@ -42,10 +49,16 @@ exports.withdraw = async (req, res) => {
                 const updateWallet = await Wallet.updateOne({ "user.userId": userId }, {
                     $inc: { money: -withdrawlAmount }
                 }).then(data => {
-                    res.status(200).json("Money Withdrawl");
+                    res.status(200).json(`${withdrawlAmount}₹ Withdrawl`);
                 }).catch(err => {
                     res.status(500).json(err);
                 });
+                const newTransaction = new Transaction({
+                    user: checkWallet.user,
+                    transaction: "withdraw",
+                    amount: withdrawlAmount
+                });
+                newTransaction.save();
             }
             else {
                 res.status(400).json("Insufficient balance!");

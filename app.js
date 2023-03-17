@@ -14,6 +14,7 @@ const adminRoute = require('./routes/admin');
 const walletRoute = require('./routes/wallet');
 const fdRoute = require('./routes/fd');
 const rateRoute = require('./routes/rate');
+const transactionRoute = require('./routes/transaction');
 
 // User Routes
 app.use('/api/user', userRoute);
@@ -29,6 +30,9 @@ app.use('/api/admin', adminRoute);
 
 // Admin Routes
 app.use('/api/rate', rateRoute);
+
+// Transaction Routes
+app.use('/api/transaction', transactionRoute);
 
 app.listen(PORT, () => {
     console.log(`Server started on http://localhost:5000`);

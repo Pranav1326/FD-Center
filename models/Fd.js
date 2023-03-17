@@ -32,6 +32,13 @@ const fdSchema = new mongoose.Schema({
         required: true,
         default: "running",
     },
+    maturityValue: {
+        type: Number,
+        required: true,
+        default: (amount, interest, months) => {
+            return (amount*(months/12)*interest)/100;
+        }
+    }
 }, { timestamps: true });
 
 //Export the model

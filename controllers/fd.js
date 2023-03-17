@@ -6,13 +6,15 @@ const userAuth = require('../middlewares/userAuth');
 // Create FD
 exports.createFd = async (req, res) => {
     const authUser = await userAuth(req);
+    const { amount, months, interest } = req.body;
     if (authUser._id === req.body.user.userId) {
         try {
             const checkBalance = await Wallet.findOne({ "user.userId": req.body.user.userId });
-            if (checkBalance.money >= req.body.amount) {
+            if (checkBalance.money >= amount) {
                 const currentDate = new Date();
-                const setDate = currentDate.setMonth(new Date().getMonth() + req.body.months);
-                const newFd = new Fd({ ...req.body, matureDate: setDate });
+                const setDate = currentDate.setMonth(new Date().getMonth() + months);
+                const maturityValue = ((amount*(months/12)*interest)/100) + amount;
+                const newFd = new Fd({ ...req.body, matureDate: setDate, maturityValue: maturityValue });
                 await newFd.save();
                 const user = await User.findOne({ _id: req.body.user.userId });
                 const updatedUser = await User.findOneAndUpdate({ _id: req.body.user.userId },

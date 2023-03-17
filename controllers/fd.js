@@ -2,6 +2,7 @@ const Fd = require('../models/Fd');
 const User = require('../models/User');
 const Wallet = require('../models/Wallet');
 const userAuth = require('../middlewares/userAuth');
+const Transaction = require('../models/Transaction');
 
 // Create FD
 exports.createFd = async (req, res) => {
@@ -17,14 +18,20 @@ exports.createFd = async (req, res) => {
                 const newFd = new Fd({ ...req.body, matureDate: setDate, maturityValue: maturityValue });
                 await newFd.save();
                 const user = await User.findOne({ _id: req.body.user.userId });
-                const updatedUser = await User.findOneAndUpdate({ _id: req.body.user.userId },
+                await User.findOneAndUpdate({ _id: req.body.user.userId },
                     { Fd: [...user.Fd, newFd._id] },
                     { new: true }
                 );
-                const updateWallet = await Wallet.findOneAndUpdate({ "user.userId": req.body.user.userId },
+                await Wallet.findOneAndUpdate({ "user.userId": req.body.user.userId },
                     { $inc: { money: -req.body.amount } },
                     { new: true }
                 );
+                const newTransaction = new Transaction({
+                    user: checkBalance.user,
+                    transaction: "create fd",
+                    amount: amount
+                });
+                await newTransaction.save();
                 newFd && res.status(200).json(newFd);
             }
             else {
@@ -53,6 +60,12 @@ exports.breakFd = async (req, res) => {
                     { new: true }
                 );
                 const updateFd = await Fd.findOneAndUpdate({ _id: fdId }, {status: "broken"}, {new: true});
+                const newTransaction = new Transaction({
+                    user: updateWallet.user,
+                    transaction: "brake fd",
+                    amount: fd.amount
+                });
+                await newTransaction.save();
                 updateFd && res.status(200).json(updateFd);
             }
             else{

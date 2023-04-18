@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
-});
+}, { timestamps: true });
 
 //Export the model
 module.exports = mongoose.model("User", userSchema);

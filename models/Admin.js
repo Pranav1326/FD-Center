@@ -15,7 +15,7 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-});
+}, { timestamps: true });
 
 //Export the model
 module.exports = mongoose.model("Admin", adminSchema);

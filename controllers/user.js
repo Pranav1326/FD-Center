@@ -1,8 +1,9 @@
 const User = require('../models/User');
+const Wallet = require('../models/Wallet');
+const Fd = require('../models/Fd');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-const Wallet = require('../models/Wallet');
 const dotenv = require('dotenv').config();
 const userAuth = require('../middlewares/userAuth');
 
@@ -103,12 +104,14 @@ exports.login = async (req, res) => {
         !validated && res.status(400).json('Wrong credentials!');
 
         // Destructuring user object fatched from db
-        const {password, ...userInfo} = user._doc;
+        const walletDetails = await Wallet.findOne({ "user.userId": user._id });
+        const FdDetails = await Fd.find({ "user.userId": user._id });
+        const { password, ...userInfo } = user._doc;
         const token = jwt.sign(
-            userInfo,
-            "RANDOM-TOKEN"
+            { userInfo, walletDetails, FdDetails },
+            process.env.TOKEN_PASS
         );
-        token && res.status(200).json({token});
+        token && res.status(200).json({ token });
     } catch (error) {
         console.log(error);
         res.status(500);

@@ -32,6 +32,7 @@
         "fd",
         "transaction"
     ],
+    "total_no_end_points": 22,
     "end-points-info": {
         "_comment_2": "=================== Admin Route ===================",
         "admin": {

@@ -1,0 +1,661 @@
+{
+    "description": "To make and manage Fix Deposits",
+    "name": "fd-center",
+    "version": "1.0.0",
+    "main": "app.js",
+    "scripts": {
+        "dev": "nodemon app.js",
+        "start": "node app.js"
+    },
+    "keywords": [
+        "fd",
+        "fd-center"
+    ],
+    "author": "Pranav1326",
+    "dependencies": {
+        "bcrypt": "^5.1.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "jsonwebtoken": "^9.0.0",
+        "mongoose": "^7.0.0",
+        "nodemailer": "^6.9.1",
+        "nodemon": "^2.0.22"
+    },
+    "baseUrl": "http://localhost:5000/api",
+    "_comment_1": "=================== List of End-Points ===================",
+    "end-points-routes": [
+        "admin",
+        "user",
+        "wallet",
+        "rate",
+        "fd",
+        "transaction"
+    ],
+    "end-points-info": {
+        "_comment_2": "=================== Admin Route ===================",
+        "admin": {
+            "_sub_comment": "---------- Register ----------",
+            "/signup": {
+                "req": {
+                    "req.body": [
+                        "username",
+                        "email",
+                        "password"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "OTP sent to mail"
+                    },
+                    "fail": {
+                        "email_exist": {
+                            "status": 403,
+                            "data": "Email exists! Please provide different email."
+                        },
+                        "admin_user_exist": {
+                            "status": 400,
+                            "data": "Admin already exist! Please Login."
+                        },
+                        "otp_mail_error": {
+                            "status": 500,
+                            "data": "Could not send the mail!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/signup/auth": {
+                "_sub_comment": "---------- Register through OTP ----------",
+                "req": {
+                    "req.body": [
+                        "username",
+                        "email",
+                        "password",
+                        "otp"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "Admin ${username} created. Please Login."
+                    },
+                    "fail": {
+                        "invalid_otp": {
+                            "status": 400,
+                            "data": "Invalid OTP!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/signin": {
+                "_sub_comment": "---------- Login ----------",
+                "req": {
+                    "req.body": [
+                        "username",
+                        "password"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "token"
+                    },
+                    "fail": {
+                        "admin_not_exist": {
+                            "status": 404,
+                            "data": "Admin does not exist!"
+                        },
+                        "invalid_password": {
+                            "status": 400,
+                            "data": "Wrong credentials!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/rate/create": {
+                "_sub_comment": "---------- Create Rate ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.body": [
+                        "userId",
+                        "interestRate",
+                        "months",
+                        "for"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "new rate"
+                    },
+                    "fail": {
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "Not Authorized!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/rate/update/:rateId": {
+                "_sub_comment": "---------- Update Rate ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.params": "rateId",
+                    "req.body": [
+                        "userId",
+                        "rateId",
+                        "interestRate",
+                        "months",
+                        "for"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "updated rate"
+                    },
+                    "fail": {
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "Not Authorized!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/rate/delete/:rateId": {
+                "_sub_comment": "---------- Delete Rate ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.params": "rateId",
+                    "req.body": [
+                        "userId",
+                        "rateId"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "Rate Deleted!"
+                    },
+                    "fail": {
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "Not Authorized!"
+                        },
+                        "not_exist": {
+                            "status": 404,
+                            "data": "Record not found!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            }
+        },
+        "_comment_3": "=================== User Route ===================",
+        "user": {
+            "_sub_comment": "---------- Register ----------",
+            "/signup": {
+                "req": {
+                    "req.body": [
+                        "username",
+                        "email",
+                        "password"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "OTP sent to mail"
+                    },
+                    "fail": {
+                        "email_exist": {
+                            "status": 403,
+                            "data": "Email exists! Please provide different email."
+                        },
+                        "admin_user_exist": {
+                            "status": 400,
+                            "data": "User already exist! Please Login."
+                        },
+                        "otp_mail_error": {
+                            "status": 500,
+                            "data": "Could not send the mail!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/signup/auth": {
+                "_sub_comment": "---------- Register through OTP ----------",
+                "req": {
+                    "req.body": [
+                        "username",
+                        "email",
+                        "password",
+                        "otp"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "User ${username} created. Please Login."
+                    },
+                    "fail": {
+                        "invalid_otp": {
+                            "status": 400,
+                            "data": "Invalid OTP!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/signin": {
+                "_sub_comment": "---------- Login ----------",
+                "req": {
+                    "req.body": [
+                        "username",
+                        "password"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "token of { userInfo, walletDetails, FdDetails }"
+                    },
+                    "fail": {
+                        "user_not_exist": {
+                            "status": 404,
+                            "data": "User does not exist!"
+                        },
+                        "invalid_password": {
+                            "status": 400,
+                            "data": "Wrong credentials!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/update/:id": {
+                "_sub_comment": "---------- User Profile Update ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.params": "id",
+                    "req.body": [
+                        "userId",
+                        "username",
+                        "password"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "User updated."
+                    },
+                    "fail": {
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "You can update only your account!"
+                        },
+                        "user_not_exist": {
+                            "status": 404,
+                            "data": "User does not exist!"
+                        },
+                        "user_update_error": {
+                            "status": 500,
+                            "data": "Error updating user details."
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/delete/:id": {
+                "_sub_comment": "---------- User Profile Delete ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.params": "id",
+                    "req.body": [
+                        "userId",
+                        "username",
+                        "password"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "User ${username} deleted!."
+                    },
+                    "fail": {
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "You can Delete only your account!"
+                        },
+                        "user_not_exist": {
+                            "status": 404,
+                            "data": "User does not exist!"
+                        },
+                        "user_delelte_error": {
+                            "status": 500,
+                            "data": "Error deleting user ${username} details."
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/:id": {
+                "_sub_comment": "---------- Get User Profile ----------",
+                "req": {
+                    "req.params": "id"
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "userInfo { username, email, account, Fd, work, profilepic }"
+                    },
+                    "fail": {
+                        "user_not_exist": {
+                            "status": 404,
+                            "data": "User does not exist!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            }
+        },
+        "_comment_4": "=================== Wallet Route ===================",
+        "wallet": {
+            "/deposit": {
+                "_sub_comment": "---------- Deposit ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.body": [
+                        "userId",
+                        "deposit"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "${depositAmount}₹ Deposited"
+                    },
+                    "fail": {
+                        "bad_request": {
+                            "status": 400,
+                            "data": "Deposit amount shouldn't greater than 1,00,00,000₹!"
+                        },
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "You can only deposit in your account!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/withdraw": {
+                "_sub_comment": "---------- Withdraw ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.body": [
+                        "userId",
+                        "withdraw"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "${depositAmount}₹ Withdrawl"
+                    },
+                    "fail": {
+                        "bad_request": {
+                            "status": 400,
+                            "data": "Insufficient balance!"
+                        },
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "You can only deposit in your account!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/:userId": {
+                "_sub_comment": "---------- Get Wallet Details ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.params": "userId"
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "wallet-data"
+                    },
+                    "fail": {
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "You can only view your account!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            }
+        },
+        "_comment_5": "=================== Rate Route ===================",
+        "rate": {
+            "/": {
+                "_sub_comment": "---------- Get All Rates ----------",
+                "req": {},
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "rates"
+                    },
+                    "fail": {
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/:rateId": {
+                "_sub_comment": "---------- Get Single Rates ----------",
+                "req": {
+                    "req.params": "rateId"
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "rate"
+                    },
+                    "fail": {
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            }
+        },
+        "_comment_6": "=================== FD Route ===================",
+        "fd": {
+            "/create": {
+                "_sub_comment": "---------- Create FD ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.body": [
+                        [ "username", "userId" ],
+                        "amount",
+                        "months",
+                        "interest"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "newFd"
+                    },
+                    "fail": {
+                        "bad_request": {
+                            "status": 400,
+                            "data": "Insufficient balance!"
+                        },
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "Unauthorized!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/break": {
+                "_sub_comment": "---------- Break FD ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.body": [
+                        [ "username", "userId" ],
+                        "fdId"
+                    ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "updateFd"
+                    },
+                    "fail": {
+                        "bad_request": {
+                            "status": 400,
+                            "data": "FD is not active!"
+                        },
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "Unauthorized!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/:userId": {
+                "_sub_comment": "---------- Get FD details of a User ----------",
+                "req": {
+                    "req.headers": "token",
+                    "req.params": "userId",
+                    "req.body": []
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "allFds"
+                    },
+                    "fail": {
+                        "unauthorized": {
+                            "status": 401,
+                            "data": "Unauthorized!"
+                        },
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            },
+            "/": {
+                "_sub_comment": "---------- Get all FDs ----------",
+                "req": {
+                    "req.headers": "",
+                    "req.params": "",
+                    "req.body": []
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "allFds"
+                    },
+                    "fail": {
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            }
+        },
+        "_comment_7": "=================== Transaction Route ===================",
+        "transaction": {
+            "/": {
+                "_sub_comment": "---------- Get transactions of a User ----------",
+                "req": {
+                    "req.headers": "",
+                    "req.params": "",
+                    "req.body": [ "userId" ]
+                },
+                "res": {
+                    "success": {
+                        "status": 200,
+                        "data": "transactions"
+                    },
+                    "fail": {
+                        "interval_server_error": {
+                            "status": 500,
+                            "data": "ERROR"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

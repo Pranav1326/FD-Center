@@ -5,12 +5,12 @@ const Transaction = require('../models/Transaction');
 // Deposit
 exports.deposit = async (req, res) => {
     const userId = req.body.userId;
-    const depositAmount = req.body.deposit;
+    const depositAmount = Number(req.body.deposit);
     const authUser = await userAuth(req);
-    if (authUser._id === userId) {
+    if (authUser.userInfo._id === userId) {
         try {
             const checkWallet = await Wallet.findOne({ "user.userId": userId });
-            if (checkWallet.money+depositAmount <= 10000000) {
+            if (checkWallet.money+depositAmount <= 1000000) {
                 const updateWallet = await Wallet.updateOne({ "user.userId": userId }, {
                     $inc: { money: depositAmount }
                 }).then(data => {
@@ -26,7 +26,7 @@ exports.deposit = async (req, res) => {
                 newTransaction.save();
             }
             else {
-                res.status(400).json("Deposit amount shouldn't greater than 1,00,00,000₹!");
+                res.status(400).json("Deposit amount shouldn't greater than 10,00,000₹!");
             }
         } catch (error) {
             console.log(error);
@@ -37,12 +37,17 @@ exports.deposit = async (req, res) => {
     }
 }
 
+exports.depositMoney = async (req, res) => {
+    console.log(req);
+    res.send("Deposited!");
+}
+
 // Withdrawl
 exports.withdraw = async (req, res) => {
     const userId = req.body.userId;
     const withdrawlAmount = req.body.withdraw;
     const authUser = await userAuth(req);
-    if (authUser._id === userId) {
+    if (authUser.userInfo._id === userId) {
         try {
             const checkWallet = await Wallet.findOne({ "user.userId": userId });
             if (checkWallet.money > 0 && (checkWallet.money-withdrawlAmount > 0)) {
@@ -76,7 +81,7 @@ exports.withdraw = async (req, res) => {
 exports.walletDetails = async (req, res) => {
     const userId = req.params.userId;
     const authUser = await userAuth(req);
-    if (authUser._id === userId) {
+    if (authUser.userInfo._id === userId) {
         try {
             const foundWallet = await Wallet.findOne({ "user.userId": userId })
                 .then(data => {

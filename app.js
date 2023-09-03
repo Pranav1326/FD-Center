@@ -37,5 +37,5 @@ app.use('/api/rate', rateRoute);
 app.use('/api/transaction', transactionRoute);
 
 app.listen(PORT, () => {
-    console.log(`Server started on http://localhost:5000`);
+    console.log(`Server started on http://localhost:${PORT}`);
 });

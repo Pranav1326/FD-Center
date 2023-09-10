@@ -12,10 +12,10 @@ router.post('/signup/auth', userController.varifyOtpRegister);
 router.post('/signin', userController.login);
 
 // Update
-router.put('/update/:id',auth , userController.updateUser);
+router.put('/update/:id', auth, userController.updateUser);
 
 // Delete
-router.delete('/delete/:id',auth ,userController.deleteUser);
+router.delete('/delete/:id', auth, userController.deleteUser);
 
 // Get User Details
 router.get('/:id',userController.getUser);

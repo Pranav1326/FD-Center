@@ -4,6 +4,9 @@ const rateController = require('../controllers/rate');
 // Get All Rates
 router.get('/', rateController.getAllRates);
 
+// Get All Rates for specific user
+router.get('/:user', rateController.getAllRatesUser);
+
 // Get Single Rate
 router.get('/:rateId', rateController.getRate);
 

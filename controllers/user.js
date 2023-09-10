@@ -129,7 +129,7 @@ exports.login = async (req, res) => {
 // Update user
 exports.updateUser = async (req, res) => {
     const authUser = await userAuth(req);
-    if (authUser._id === req.body.userId && req.body.userId === req.params.id) {
+    if (authUser.userInfo._id === req.body.userId && req.body.userId === req.params.id) {
         try {
             const id = req.body.userId;
             const existingUser = await User.findOne({ _id: id });
@@ -158,7 +158,7 @@ exports.updateUser = async (req, res) => {
 // Delete User
 exports.deleteUser = async (req, res) => {
     const authUser = await userAuth(req);
-    if (authUser._id === req.body.userId && req.body.userId === req.params.id) {
+    if (authUser.userInfo._id === req.body.userId && req.body.userId === req.params.id) {
         try {
             const id = req.body.userId;
             const existingUser = await User.findOne({ _id: id });

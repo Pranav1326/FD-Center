@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
     },
     accout: {
         type: String,
+        default: "normal",
+        required: true,
+    },
+    dateOfBirth: {
+        type: Date,
     },
     Fd: {
         type: Array,

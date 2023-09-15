@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    accout: {
+    account: {
         type: String,
         default: "normal",
         required: true,

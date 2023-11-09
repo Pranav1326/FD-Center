@@ -118,7 +118,11 @@ exports.createRate = async (req, res) => {
             const newRate = new Rate({
                 interestRate: req.body.interestRate,
                 months: req.body.months,
-                for: req.body.for
+                for: req.body.for,
+                createdBy: {
+                    adminId: authUser._id,
+                    admin: authUser.username
+                }
             });
             await newRate.save();
             newRate && res.status(200).json(newRate);

@@ -13,7 +13,17 @@ const rateSchema = new mongoose.Schema({
     for: {
         type: String,
         required: true,
-    }
+    },
+    createdBy: {
+        adminId: {
+            type: String,
+            required: true,
+        },
+        admin: {
+            type: String,
+            required: true,
+        }
+    },
 }, { timestamps: true });
 
 //Export the model

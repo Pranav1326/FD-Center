@@ -11,6 +11,9 @@ router.post('/signup/auth', adminController.varifyOtpRegister);
 // Login
 router.post('/signin', adminController.login);
 
+// Get All FDs
+router.get('/getallfds', auth, adminController.getAllFds);
+
 // Create Rate
 router.post('/rate/create', auth, adminController.createRate);
 

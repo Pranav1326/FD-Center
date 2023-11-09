@@ -11,7 +11,4 @@ router.delete('/break', auth, fdController.breakFd);
 // Get All FDs of Specific User
 router.get('/:userId', auth, fdController.getAllFdsOfUser);
 
-// Get All FDs
-router.get('/', auth, fdController.getAllFds);
-
 module.exports = router;

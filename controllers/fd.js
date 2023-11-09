@@ -81,17 +81,6 @@ exports.breakFd = async (req, res) => {
     }
 }
 
-// Get All FDs
-exports.getAllFds = async (req, res) => {
-    try {
-        const allFds = await Fd.find();
-        allFds && res.status(200).json(allFds);
-    } catch (error) {
-        res.status(500);
-        console.log(error);
-    }
-}
-
 // Get All FDs of Specific User
 exports.getAllFdsOfUser = async (req, res) => {
     const userId = req.params.userId;

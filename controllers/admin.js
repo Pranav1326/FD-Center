@@ -6,6 +6,7 @@ const Wallet = require('../models/Wallet');
 const dotenv = require('dotenv').config();
 const userAuth = require('../middlewares/userAuth');
 const Rate = require('../models/Rate');
+const Fd = require('../models/Fd');
 
 // Nodemailer
 let transporter = nodemailer.createTransport({
@@ -100,7 +101,7 @@ exports.login = async (req, res) => {
         const { password, ...adminInfo } = admin._doc;
         const token = jwt.sign(
             adminInfo,
-            "RANDOM-TOKEN"
+            process.env.TOKEN_PASS
         );
         token && res.status(200).json({ token });
     } catch (error) {
@@ -174,5 +175,16 @@ exports.deleteRate = async (req, res) => {
     }
     else{
         res.status(401).json("Not Authorized!");
+    }
+}
+
+// Get All FDs
+exports.getAllFds = async (req, res) => {
+    try {
+        const allFds = await Fd.find();
+        allFds && res.status(200).json(allFds);
+    } catch (error) {
+        res.status(500);
+        console.log(error);
     }
 }

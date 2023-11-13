@@ -1,10 +1,12 @@
-const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
-const Wallet = require('../models/Wallet');
 const dotenv = require('dotenv').config();
+const nodemailer = require('nodemailer');
+
 const userAuth = require('../middlewares/userAuth');
+
+const Admin = require('../models/Admin');
+const Wallet = require('../models/Wallet');
 const Rate = require('../models/Rate');
 const Fd = require('../models/Fd');
 const SuperAdmin = require('../models/SuperAdmin');
@@ -69,13 +71,13 @@ exports.requestForAdmin = async (req, res) => {
                 subject: "Request generated for Admin in FD Center",
                 html: ` 
                     <p>Hello ${newTempAdmin.username},</p>
-
+                    <br/>
                     <p>We hope this message finds you well. A request has been generated for the role of an Administrator in FD-Center under the username <strong>${newTempAdmin.username}</strong>. Our system administrator will review and take necessary action on your request shortly. You will be notified through email once the process is completed.</p>
-                    
+                    <br/>
                     <p><i>Please note that the verification process may take 2-3 business days. We appreciate your patience. If the process extends beyond this timeframe, feel free to submit another request.</i></p>
-                    
+                    <br/>
                     <p>Thank you for your understanding.</p>
-                    
+                    <br/>
                     <p>Best Regards,</p>
                     <p><strong>Team FD-Center</strong></p>
                     `

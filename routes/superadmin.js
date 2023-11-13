@@ -3,7 +3,7 @@ const superAdminController = require('../controllers/superadmin');
 const auth = require('../middlewares/auth');
 
 // login
-router.post('/signin', auth, superAdminController.login);
+router.post('/signin', superAdminController.login);
 
 // Admin Requests
 router.get('/adminrequests', auth, superAdminController.getAllAdminRequests);

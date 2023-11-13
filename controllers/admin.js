@@ -7,6 +7,8 @@ const dotenv = require('dotenv').config();
 const userAuth = require('../middlewares/userAuth');
 const Rate = require('../models/Rate');
 const Fd = require('../models/Fd');
+const SuperAdmin = require('../models/SuperAdmin');
+const AdminRequest = require('../models/AdminRequest');
 
 // Nodemailer
 let transporter = nodemailer.createTransport({
@@ -30,7 +32,79 @@ const generateOtp = () => {
 
 // Request for an Admin
 exports.requestForAdmin = async (req, res) => {
-    
+    try {
+        const { username, email } = req.body;
+        const isAdminExist = await Admin.findOne({ username });
+        const adminWithSameEmail = await Admin.findOne({ email });
+        const superAdmin = await SuperAdmin.findOne({ _id: process.env.SUPERADMIN_ID });
+        if (adminWithSameEmail) {
+            res.status(403).json("Email exists! Please provide different email.");
+        }
+        if (isAdminExist) {
+            res.status(400).json("Admin already exist! Please Login.");
+        }
+        if (!adminWithSameEmail && !isAdminExist) {
+            const newTempAdmin = new Admin({
+                username: username,
+                email: email,
+                active: false,
+                adminStatus: "temporary"
+            });
+            await newTempAdmin.save();
+
+            const newAdminRequest = new AdminRequest({
+                user: {
+                    userId: newTempAdmin._id,
+                    username: newTempAdmin.username,
+                    email: newTempAdmin.email
+                },
+                status: "running"
+            });
+            await newAdminRequest.save();
+
+            // E-mail goes to requested admin
+            let mailToAdmin = await transporter.sendMail({
+                from: 'fdcenter.mernstack@gmail.com',
+                to: `${newTempAdmin.email}`,
+                subject: "Request generated for Admin in FD Center",
+                html: ` 
+                    <p>Hello ${newTempAdmin.username},</p>
+
+                    <p>We hope this message finds you well. A request has been generated for the role of an Administrator in FD-Center under the username <strong>${newTempAdmin.username}</strong>. Our system administrator will review and take necessary action on your request shortly. You will be notified through email once the process is completed.</p>
+                    
+                    <p><i>Please note that the verification process may take 2-3 business days. We appreciate your patience. If the process extends beyond this timeframe, feel free to submit another request.</i></p>
+                    
+                    <p>Thank you for your understanding.</p>
+                    
+                    <p>Best Regards,</p>
+                    <p><strong>Team FD-Center</strong></p>
+                    `
+            });
+
+            // E-mail goes to SuperAdmin
+            let mailToSuperadmin = await transporter.sendMail({
+                from: 'fdcenter.mernstack@gmail.com',
+                to: `${superAdmin.email}`,
+                subject: "Request generated for Admin in FD Center",
+                html: `
+                    <p>Hello ${superAdmin.username},</p> \n
+
+                    <p>A request has been generated for an Admin role under following credentials</p>
+                    <p>Username: <strong>${newTempAdmin.username}</strong></p>
+                    <p>Email: <strong>${newTempAdmin.email}</strong></p>
+                    
+                    <p>Kindly verify the request on portal.</p>
+
+                    <p><strong>FD-Center</strong></p>
+                    `
+            });
+            !(mailToAdmin && mailToSuperadmin) && res.status(500).json("Could not send the mail!");
+            (mailToAdmin && mailToSuperadmin) && res.status(200).json("Please check your mail.");
+        }
+    } catch (error) {
+        res.status(500);
+        console.log(error);
+    }
 }
 
 // New Admin Registration

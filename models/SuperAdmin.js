@@ -14,11 +14,6 @@ const superAdminSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    },
-    requests: {
-        type: Array,
-        default: [],
-        required: true
     }
 }, { timestamps: true });
 

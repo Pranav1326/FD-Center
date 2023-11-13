@@ -1,26 +1,32 @@
 const SuperAdmin = require('../models/SuperAdmin');
 const userAuth = require('../middlewares/userAuth');
 
-exports.login = (req, res) => {
+const bcrypt = require('bcrypt');
 
+exports.login = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        
+    }
 }
 
-exports.getAllAdminRequests = (req, res) => {
+exports.getAllAdminRequests = async (req, res) => {
     
 }
 
-exports.approveAdmin = (req, res) => {
+exports.approveAdmin = async (req, res) => {
 
 }
 
-exports.rejectAdmin = (req, res) => {
+exports.rejectAdmin = async (req, res) => {
 
 }
 
-exports.disableAdmin = (req, res) => {
+exports.disableAdmin = async (req, res) => {
 
 }
 
-exports.enableAdmin = (req, res) => {
+exports.enableAdmin = async (req, res) => {
 
 }

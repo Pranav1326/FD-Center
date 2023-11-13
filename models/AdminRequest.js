@@ -17,17 +17,7 @@ const adminRequestSchema = new mongoose.Schema({
             unique: true
         }
     },
-    assignedTo: {
-        userId: {
-            type: String,
-            required: true
-        },
-        username: {
-            type: String,
-            required: true
-        }
-    },
-    stauts: {
+    status: {
         type: String,
         default: "running", // "running" || "approved" || "rejected"
         required: true

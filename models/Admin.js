@@ -12,8 +12,7 @@ const adminSchema = new mongoose.Schema({
         unique: true
     },
     password: {
-        type: String,
-        required: true
+        type: String
     },
     active: {
         type: Boolean,
@@ -25,7 +24,7 @@ const adminSchema = new mongoose.Schema({
         default: [],
         required: true
     },
-    adminStauts: {
+    adminStatus: {
         type: String,
         default: "temporary",
         required: true

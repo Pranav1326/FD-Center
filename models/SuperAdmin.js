@@ -1,7 +1,7 @@
 const mongoose = require("mongoose"); // Erase if already required
 
 // Declare the Schema of the Mongo model
-const adminSchema = new mongoose.Schema({
+const superAdminSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true
@@ -15,22 +15,12 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    active: {
-        type: Boolean,
-        default: false,
-        required: true
-    },
-    ratesCreated: {
+    requests: {
         type: Array,
         default: [],
-        required: true
-    },
-    adminStauts: {
-        type: String,
-        default: "temporary",
         required: true
     }
 }, { timestamps: true });
 
 //Export the model
-module.exports = mongoose.model("Admin", adminSchema);
+module.exports = mongoose.model("SuperAdmin", superAdminSchema);

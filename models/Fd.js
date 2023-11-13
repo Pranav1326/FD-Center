@@ -30,7 +30,7 @@ const fdSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        default: "running",
+        default: "running", // "running" || "matured" || "broken"
     },
     maturityValue: {
         type: Number,

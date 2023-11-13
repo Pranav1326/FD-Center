@@ -28,6 +28,11 @@ const generateOtp = () => {
     return otptemp;
 }
 
+// Request for an Admin
+exports.requestForAdmin = async (req, res) => {
+    
+}
+
 // New Admin Registration
 exports.register = async (req, res) => {
     try {

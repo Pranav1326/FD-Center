@@ -2,8 +2,8 @@ const router = require('express').Router();
 const adminController = require('../controllers/admin');
 const auth = require('../middlewares/auth');
 
-// Register
-router.post('/signup', adminController.register);
+// Request for an Admin
+router.post('/adminrequest', adminController.requestForAdmin);
 
 // Register Auth OTP
 router.post('/signup/auth', adminController.varifyOtpRegister);

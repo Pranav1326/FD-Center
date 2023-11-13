@@ -17,6 +17,7 @@ const walletRoute = require('./routes/wallet');
 const fdRoute = require('./routes/fd');
 const rateRoute = require('./routes/rate');
 const transactionRoute = require('./routes/transaction');
+const superAdminRoute = require('./routes/superadmin');
 
 // User Routes
 app.use('/api/user', userRoute);
@@ -29,6 +30,9 @@ app.use('/api/fd', fdRoute);
 
 // Admin Routes
 app.use('/api/admin', adminRoute);
+
+// Superadmin Routes
+app.use('/api/superadmin', superAdminRoute);
 
 // Admin Routes
 app.use('/api/rate', rateRoute);

@@ -1,13 +1,16 @@
 const dotenv = require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 
 const SuperAdmin = require('../models/SuperAdmin');
 const Admin = require('../models/Admin');
 const AdminRequest = require('../models/AdminRequest');
-const userAuth = require('../middlewares/userAuth');
+const Fd = require('../models/Fd');
+const User = require('../models/User');
+const Transaction = require('../models/Transaction');
 
-const bcrypt = require('bcrypt');
+const userAuth = require('../middlewares/userAuth');
 
 // Nodemailer
 let transporter = nodemailer.createTransport({
@@ -303,6 +306,61 @@ exports.enableAdmin = async (req, res) => {
         else{
             res.status(401).json("Not Authorized!");
         }
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+    }
+}
+
+// All Admins List
+exports.allAdminList = async (req, res) => {
+    try {
+        const adminList = await Admin.find();
+        doc && res.status(200).json(adminList);
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+    }
+}
+
+// Get Single Admin
+exports.getSingleAdmin = async (req, res) => {
+    try {
+        const admin = await Admin.findOne({ _id: req.params.adminId });
+        admin && res.status(200).json(admin);
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+    }
+}
+
+// Get All FDs
+exports.getAllFds = async (req, res) => {
+    try {
+        const allFds = await Fd.find();
+        allFds && res.status(200).json(allFds);
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+    }
+}
+
+// Get All Users
+exports.getAllUsers = async (req, res) => {
+    try {
+        const allUsers = await User.find();
+        allUsers && res.status(200).json(allUsers);
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+    }
+}
+
+// Get All Transactions
+exports.getAllTransactions = async (req, res) => {
+    try {
+        const allTransactions = await Transaction.find();
+        allTransactions && res.status(200).json(allTransactions);
     } catch (error) {
         console.log(error);
         res.status(500);

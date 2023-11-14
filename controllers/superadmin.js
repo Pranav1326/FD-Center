@@ -198,7 +198,54 @@ exports.rejectAdmin = async (req, res) => {
 // Disable Admin
 exports.disableAdmin = async (req, res) => {
     try {
-        
+        const authUser = await userAuth(req);
+        if(authUser._id === process.env.SUPERADMIN_ID){
+            await Admin.findOne({ _id: req.body.adminId })
+            .then(async (doc) => {
+                if(doc.adminStatus === "temporary"){
+                    res.status(400).json("Admin is not Approved!");
+                }
+                else if(doc.active === true){
+                    await Admin.findOneAndUpdate(
+                        { _id: req.body.adminId },
+                        { active: false },
+                        { new: true }
+                    )
+                    .then(async (doc) => {
+                        let responseMail = await transporter.sendMail({
+                            from: 'fdcenter.mernstack@gmail.com',
+                            to: `${doc.email}`,
+                            subject: "Admin account deactivaiton in FD Center",
+                            html: `
+                                <p>Hello ${doc.username},</p>
+                                <br/>
+                                <p>This is to inform you that you account in FD Center as an Admin has been Disabled by Superadmin.</p>
+                                <br/>
+                                <p>If you have any questions or concerns regarding the rejection, please feel free to reach out to fdcenter.mernstack@gmail.com.</p>
+                                <br/>
+                                <p>Regards,</p>
+                                <p><strong>Team FD-Center</strong></p>                                
+                            `
+                        });
+                        (doc && responseMail) && res.status(200).json(`Admin ${doc.username} Disabled!`);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(500).json("Error finding Admin!");
+                    });
+                }
+                else{
+                    res.status(400).json("Admin is already disabled!");
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json("Something went wrong!");
+            });
+        }
+        else{
+            res.status(401).json("Not Authorized!");
+        }
     } catch (error) {
         console.log(error);
         res.status(500);
@@ -208,7 +255,54 @@ exports.disableAdmin = async (req, res) => {
 // Enable Admin
 exports.enableAdmin = async (req, res) => {
     try {
-        
+        const authUser = await userAuth(req);
+        if(authUser._id === process.env.SUPERADMIN_ID){
+            await Admin.findOne({ _id: req.body.adminId })
+            .then(async (doc) => {
+                if(doc.adminStatus === "temporary"){
+                    res.status(400).json("Admin is not Approved!");
+                }
+                else if(doc.active === false){
+                    await Admin.findOneAndUpdate(
+                        { _id: req.body.adminId },
+                        { active: true },
+                        { new: true }
+                    )
+                    .then(async (doc) => {
+                        let responseMail = await transporter.sendMail({
+                            from: 'fdcenter.mernstack@gmail.com',
+                            to: `${doc.email}`,
+                            subject: "Admin account reactivaiton in FD Center",
+                            html: `
+                                <p>Hello ${doc.username},</p>
+                                <br/>
+                                <p>This is to inform you that you account in FD Center as an Admin has been Enabled by Superadmin.</p>
+                                <br/>
+                                <p>If you have any questions or concerns regarding the rejection, please feel free to reach out to fdcenter.mernstack@gmail.com.</p>
+                                <br/>
+                                <p>Regards,</p>
+                                <p><strong>Team FD-Center</strong></p>                                
+                            `
+                        });
+                        (doc && responseMail) && res.status(200).json(`Admin ${doc.username} Enabled!`);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(500).json("Error finding Admin!");
+                    });
+                }
+                else{
+                    res.status(400).json("Admin is already enabled!");
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json("Something went wrong!");
+            });
+        }
+        else{
+            res.status(401).json("Not Authorized!");
+        }
     } catch (error) {
         console.log(error);
         res.status(500);

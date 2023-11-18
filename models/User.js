@@ -1,39 +1,48 @@
-const mongoose = require("mongoose"); // Erase if already required
+const mongoose = require("mongoose");
 
 // Declare the Schema of the Mongo model
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true,
+        unique: true
     },
     email: {
         type: String,
         required: true,
-        unique: true,
+        unique: true
     },
     password: {
         type: String,
-        required: true,
+        required: true
+    },
+    otp: {
+        type: Number,
+        default: null
+    },
+    active: {
+        type: Boolean,
+        default: false,
+        required: true
     },
     account: {
         type: String,
         default: "normal",
-        required: true,
+        required: true
     },
     dateOfBirth: {
-        type: Date,
+        type: Date
     },
     Fd: {
         type: Array,
-        default: [],
+        default: []
     },
     work: {
-        type: String,
+        type: String
     },
     profilepic: {
         type: String,
-        default: "",
+        default: ""
     },
 }, { timestamps: true });
 

@@ -12,6 +12,8 @@ const Fd = require('../models/Fd');
 const SuperAdmin = require('../models/SuperAdmin');
 const AdminRequest = require('../models/AdminRequest');
 
+const generateOtp = require('../utils/otpGenerator');
+
 // Nodemailer
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -23,36 +25,23 @@ let transporter = nodemailer.createTransport({
     },
 });
 
-var otp;
-const generateOtp = () => {
-    otptemp = Math.floor(Math.random() * 10000);
-    if (otptemp.toString().length < 4) {
-        generateOtp();
-    }
-    return otptemp;
-}
-
 // Request for an Admin
 exports.requestForAdmin = async (req, res) => {
     try {
-        const { username, email } = req.body;
-        const isAdminExist = await Admin.findOne({ username });
-        const adminWithSameEmail = await Admin.findOne({ email });
+        const { username, otp } = req.body;
+        const newAdmin = await Admin.findOne({ username });
         const superAdmin = await SuperAdmin.findOne({ _id: process.env.SUPERADMIN_ID });
-        if (adminWithSameEmail) {
-            res.status(403).json("Email exists! Please provide different email.");
-        }
-        if (isAdminExist) {
-            res.status(400).json("Admin already exist! Please Login.");
-        }
-        if (!adminWithSameEmail && !isAdminExist) {
-            const newTempAdmin = new Admin({
-                username: username,
-                email: email,
-                active: false,
-                adminStatus: "temporary"
-            });
-            await newTempAdmin.save();
+        if (otp === newAdmin.otp) {
+            const newTempAdmin = await Admin.findOneAndUpdate(
+                { _id: newAdmin._id },
+                { 
+                    $set: {
+                        validated: true,
+                        otp: null
+                    }
+                },
+                { new: true }
+            );
 
             const newAdminRequest = new AdminRequest({
                 user: {
@@ -64,7 +53,7 @@ exports.requestForAdmin = async (req, res) => {
             });
             await newAdminRequest.save();
 
-            // E-mail goes to requested admin
+            // E-mail goes to requested Admin
             let mailToAdmin = await transporter.sendMail({
                 from: 'fdcenter.mernstack@gmail.com',
                 to: `${newTempAdmin.email}`,
@@ -103,6 +92,9 @@ exports.requestForAdmin = async (req, res) => {
             !(mailToAdmin && mailToSuperadmin) && res.status(500).json("Could not send the mail!");
             (mailToAdmin && mailToSuperadmin) && res.status(200).json("Please check your mail.");
         }
+        else{
+            res.status(400).json("Invalid OTP!");
+        }
     } catch (error) {
         res.status(500);
         console.log(error);
@@ -112,8 +104,9 @@ exports.requestForAdmin = async (req, res) => {
 // New Admin Registration
 exports.register = async (req, res) => {
     try {
-        const isAdminExist = await Admin.findOne({ username: req.body.username });
-        const adminWithSameEmail = await Admin.findOne({ email: req.body.email });
+        const { username, email } = req.body;
+        const isAdminExist = await Admin.findOne({ username });
+        const adminWithSameEmail = await Admin.findOne({ email });
         if (adminWithSameEmail) {
             res.status(403).json("Email exists! Please provide different email.");
         }
@@ -121,50 +114,25 @@ exports.register = async (req, res) => {
             res.status(400).json("Admin already exist! Please Login.");
         }
         if (!adminWithSameEmail && !isAdminExist) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(req.body.password, salt);
             const newAdmin = new Admin({
-                username: req.body.username,
-                email: req.body.email,
-                password: hashedPassword
+                username: username,
+                email: email,
+                otp: generateOtp(),
+                active: false,
+                adminStatus: "temporary"
             });
-            // const admin = await newAdmin.save();
-            otp = generateOtp();
+            const admin = await newAdmin.save();
             let info = await transporter.sendMail({
                 from: 'fdcenter.mernstack@gmail.com',
-                to: `${req.body.email}`,
+                to: `${newAdmin.email}`,
                 subject: "Greeting from FD Center",
-                html: `<p>Hello ${req.body.username},</p> \n<p>This is your one time password(otp) <strong>${otp}</strong></p><p>\nPlease do not share this otp to anyone.</p>`,
+                html: `<p>Hello ${newAdmin.username},</p> \n<p>This is your one time password(otp) <strong>${newAdmin.otp}</strong></p><p>\nPlease do not share this otp to anyone.</p>`,
             });
             !info && res.status(500).json("Could not send the mail!");
-            info && res.status(200).json("OTP sent to mail");
+            (admin && info) && res.status(200).json("OTP sent to mail");
         }
     } catch (error) {
         res.status(500);
-        console.log(error);
-    }
-}
-
-// Register Auth OTP
-exports.varifyOtpRegister = async (req, res) => {
-    try {
-        const adminOtp = Number(req.body.otp);
-        if (adminOtp === otp) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(req.body.password, salt);
-            const newAdmin = new Admin({
-                username: req.body.username,
-                email: req.body.email,
-                password: hashedPassword
-            });
-            const admin = await newAdmin.save();
-            res.status(200).json(`Admin ${req.body.username} created. Please Login.`);
-        }
-        else {
-            res.status(400).json("Invalid OTP!");
-        }
-    } catch (error) {
-        res.status(500).json(error);
         console.log(error);
     }
 }
@@ -175,16 +143,26 @@ exports.login = async (req, res) => {
         const admin = await Admin.findOne({ username: req.body.username });
         !admin && res.status(404).json('Admin does not exist!');
 
-        const validated = await bcrypt.compare(req.body.password, admin.password);
-        !validated && res.status(400).json('Wrong credentials!');
-
-        // Destructuring Admin object fatched from db
-        const { password, ...adminInfo } = admin._doc;
-        const token = jwt.sign(
-            adminInfo,
-            process.env.TOKEN_PASS
-        );
-        token && res.status(200).json({ token });
+        if(admin){
+            if(!admin.validated){
+                res.status(400).json("Please validate your account!");
+            }
+            if(admin.adminStatus !== "permanent"){
+                res.status(400).json("Your account has not been activated yet!");
+            }
+            else{
+                const validated = await bcrypt.compare(req.body.password, admin.password);
+                !validated && res.status(400).json('Wrong credentials!');
+                
+                // Destructuring Admin object fatched from db
+                const { password, ...adminInfo } = admin._doc;
+                const token = jwt.sign(
+                    adminInfo,
+                    process.env.TOKEN_PASS
+                );
+                token && res.status(200).json({ token });
+            }
+        }
     } catch (error) {
         console.log(error);
         res.status(500);

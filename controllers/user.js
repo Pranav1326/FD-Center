@@ -60,8 +60,8 @@ exports.register = async (req, res) => {
 // Register Auth OTP
 exports.varifyOtpRegister = async (req, res) => {
     try {
-        const userOtp = Number(req.body.otp);
-        const newUser = await User.findOne({ username: req.body.username });
+        const { username, userOtp } = req.body;
+        const newUser = await User.findOne({ username });
         if (userOtp === newUser.otp) {
             await User.findOneAndUpdate(
                 { _id: newUser._id },
@@ -108,11 +108,9 @@ exports.login = async (req, res) => {
                 res.status(400).json("Please validate your account!");
             }
             else{
-
                 const validated = await bcrypt.compare(req.body.password, user.password);
                 !validated && res.status(400).json('Wrong credentials!');
-                
-                // Destructuring user object fatched from db
+
                 const walletDetails = await Wallet.findOne({ "user.userId": user._id });
                 const FdDetails = await Fd.find({ "user.userId": user._id });
                 const { password, ...userInfo } = user._doc;

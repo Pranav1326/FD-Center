@@ -10,7 +10,6 @@ const userAuth = require('../middlewares/userAuth');
 
 const generateOtp = require('../utils/otpGenerator');
 
-const { testMail } = require('../utils/email_templates/testMail');
 const { userOtp } = require('../utils/email_templates/userOtp');
 const { greetingUser } = require('../utils/email_templates/greetingUser');
 

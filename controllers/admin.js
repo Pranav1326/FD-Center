@@ -13,14 +13,17 @@ const SuperAdmin = require('../models/SuperAdmin');
 const AdminRequest = require('../models/AdminRequest');
 
 const generateOtp = require('../utils/otpGenerator');
+const { userOtp } = require('../utils/email_templates/userOtp');
+const { adminRequest } = require('../utils/email_templates/adminRequest');
+const { requestToSuperadmin } = require('../utils/email_templates/requestToSuperadmin');
 
 // Nodemailer
-let transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
     secure: true,
     auth: {
-        user: "fdcenter.mernstack@gmail.com",
+        user: process.env.GMAIL_ID,
         pass: process.env.GMAIL_KEYPASS,
     },
 });
@@ -54,41 +57,11 @@ exports.requestForAdmin = async (req, res) => {
             await newAdminRequest.save();
 
             // E-mail goes to requested Admin
-            let mailToAdmin = await transporter.sendMail({
-                from: 'fdcenter.mernstack@gmail.com',
-                to: `${newTempAdmin.email}`,
-                subject: "Request generated for Admin in FD Center",
-                html: ` 
-                    <p>Hello ${newTempAdmin.username},</p>
-                    <br/>
-                    <p>We hope this message finds you well. A request has been generated for the role of an Administrator in FD-Center under the username <strong>${newTempAdmin.username}</strong>. Our system administrator will review and take necessary action on your request shortly. You will be notified through email once the process is completed.</p>
-                    <br/>
-                    <p><i>Please note that the verification process may take 2-3 business days. We appreciate your patience. If the process extends beyond this timeframe, feel free to submit another request.</i></p>
-                    <br/>
-                    <p>Thank you for your understanding.</p>
-                    <br/>
-                    <p>Best Regards,</p>
-                    <p><strong>Team FD-Center</strong></p>
-                    `
-            });
+            const mailToAdmin = await transporter.sendMail(adminRequest(newTempAdmin.email, newTempAdmin.username));
 
             // E-mail goes to SuperAdmin
-            let mailToSuperadmin = await transporter.sendMail({
-                from: 'fdcenter.mernstack@gmail.com',
-                to: `${superAdmin.email}`,
-                subject: "Request generated for Admin in FD Center",
-                html: `
-                    <p>Hello ${superAdmin.username},</p> \n
-
-                    <p>A request has been generated for an Admin role under following credentials</p>
-                    <p>Username: <strong>${newTempAdmin.username}</strong></p>
-                    <p>Email: <strong>${newTempAdmin.email}</strong></p>
-                    
-                    <p>Kindly verify the request on portal.</p>
-
-                    <p><strong>FD-Center</strong></p>
-                    `
-            });
+            const mailToSuperadmin = await transporter.sendMail(requestToSuperadmin(superAdmin.email, superAdmin.username, newTempAdmin.username, newTempAdmin.email));
+            
             !(mailToAdmin && mailToSuperadmin) && res.status(500).json("Could not send the mail!");
             (mailToAdmin && mailToSuperadmin) && res.status(200).json("Please check your mail.");
         }
@@ -122,12 +95,7 @@ exports.register = async (req, res) => {
                 adminStatus: "temporary"
             });
             const admin = await newAdmin.save();
-            let info = await transporter.sendMail({
-                from: 'fdcenter.mernstack@gmail.com',
-                to: `${newAdmin.email}`,
-                subject: "Greeting from FD Center",
-                html: `<p>Hello ${newAdmin.username},</p> \n<p>This is your one time password(otp) <strong>${newAdmin.otp}</strong></p><p>\nPlease do not share this otp to anyone.</p>`,
-            });
+            const info = await transporter.sendMail(userOtp(newAdmin.email, newAdmin.username, newAdmin.otp));
             !info && res.status(500).json("Could not send the mail!");
             (admin && info) && res.status(200).json("OTP sent to mail");
         }

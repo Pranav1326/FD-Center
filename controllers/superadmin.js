@@ -14,8 +14,9 @@ const userAuth = require('../middlewares/userAuth');
 
 const Imap = require('imap');
 const {simpleParser} = require('mailparser');
+
 const imapConfig = {
-  user: 'fdcenter.mernstack@gmail.com',
+  user: process.env.GMAIL_ID,
   password: process.env.GMAIL_PASS,
   host: 'imap.gmail.com',
   port: 993,

@@ -10,22 +10,27 @@ const userAuth = require('../middlewares/userAuth');
 
 const generateOtp = require('../utils/otpGenerator');
 
+const { testMail } = require('../utils/email_templates/testMail');
+const { userOtp } = require('../utils/email_templates/userOtp');
+const { greetingUser } = require('../utils/email_templates/greetingUser');
+
 // Nodemailer
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
     secure: true,
     auth: {
-        user: "fdcenter.mernstack@gmail.com",
-        pass: process.env.GMAIL_KEYPASS,
+        user: process.env.GMAIL_ID,
+        pass: process.env.GMAIL_PASS,
     },
 });
 
 // New User Registration
 exports.register = async (req, res) => {
     try {
-        const isUserExist = await User.findOne({ username: req.body.username });
-        const userWithSameEmail = await User.findOne({ email: req.body.email });
+        const { username, email, password } = req.body;
+        const isUserExist = await User.findOne({ username });
+        const userWithSameEmail = await User.findOne({ email });
         if (userWithSameEmail) {
             res.status(403).json("Email exists! Please provide different email.");
         }
@@ -34,20 +39,16 @@ exports.register = async (req, res) => {
         }
         if (!userWithSameEmail && !isUserExist) {
             const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            const hashedPassword = await bcrypt.hash(password, salt);
             const newUser = new User({
-                username: req.body.username,
-                email: req.body.email,
+                username: username,
+                email: email,
                 password: hashedPassword,
                 otp: generateOtp()
             });
             const user = await newUser.save();
-            let info = await transporter.sendMail({
-                from: 'fdcenter.mernstack@gmail.com',
-                to: `${req.body.email}`,
-                subject: "OTP for Registration in FD Center",
-                html: `<p>Hello ${req.body.username},</p> \n<p>This is your one time password(otp) <strong>${newUser.otp}</strong></p><p>\nPlease do not share this otp to anyone.</p>`,
-            });
+            let info = await transporter.sendMail(userOtp(newUser.email, newUser.username, newUser.otp));
+
             !info && res.status(500).json("Could not send the mail!");
             (user && info) && res.status(200).json("OTP sent to mail");
         }
@@ -80,12 +81,7 @@ exports.varifyOtpRegister = async (req, res) => {
                 }
             });
             await newWallet.save();
-            let info = await transporter.sendMail({
-                from: 'fdcenter.mernstack@gmail.com',
-                to: `${newUser.email}`,
-                subject: "Greeting from FD Center",
-                html: `<div dir=3D"ltr">Hello <b>${newUser.username},</b><br><br>Hope you are doing well, First of all congratulations for opening an account in FD-Center under the username of ${newUser.username}. Now you can get benefits of high returns on your investment. <br><br>Please do not share these credentials to anyone.<br><br><p><i><b>Note:</b>This is a prototype website and does not involve any trancasction with real money. FD-Center will not responsible for any transaction that includes real money. The money and transactions shown in this website are totally virtual.</i></p><b>Happy Investing!<br></b><br><p>Regards</p><p><strong>Team FD-Center</strong></p>`,
-            });
+            let info = await transporter.sendMail(greetingUser(newUser.email, newUser.username));
             info && res.status(200).json(`User ${newUser.username} created. Please Login.`);
         }
         else {

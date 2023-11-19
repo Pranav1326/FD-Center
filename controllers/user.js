@@ -12,17 +12,10 @@ const generateOtp = require('../utils/otpGenerator');
 
 const { userOtp } = require('../utils/email_templates/userOtp');
 const { greetingUser } = require('../utils/email_templates/greetingUser');
+const { transporterConfig } = require('../utils/email_templates/transporterConfig');
 
 // Nodemailer
-let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.GMAIL_ID,
-        pass: process.env.GMAIL_PASS,
-    },
-});
+let transporter = nodemailer.createTransport(transporterConfig());
 
 // New User Registration
 exports.register = async (req, res) => {

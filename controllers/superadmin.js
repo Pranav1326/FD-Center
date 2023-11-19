@@ -18,6 +18,7 @@ const { adminApproved } = require('../utils/email_templates/adminApproved');
 const { adminRejected } = require('../utils/email_templates/adminRejected');
 const { adminDisabled } = require('../utils/email_templates/adminDisabled');
 const { adminEnabled } = require('../utils/email_templates/adminEnabled');
+const { transporterConfig } = require('../utils/email_templates/transporterConfig');
 
 const imapConfig = {
   user: process.env.GMAIL_ID,
@@ -29,15 +30,7 @@ const imapConfig = {
 };
 
 // Nodemailer
-let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-        user: "fdcenter.mernstack@gmail.com",
-        pass: process.env.GMAIL_KEYPASS,
-    },
-});
+let transporter = nodemailer.createTransport(transporterConfig());
 
 // Super Admin Login
 exports.login = async (req, res) => {

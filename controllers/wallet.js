@@ -37,11 +37,6 @@ exports.deposit = async (req, res) => {
     }
 }
 
-exports.depositMoney = async (req, res) => {
-    console.log(req);
-    res.send("Deposited!");
-}
-
 // Withdrawl
 exports.withdraw = async (req, res) => {
     const userId = req.body.userId;

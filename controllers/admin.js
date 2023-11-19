@@ -16,17 +16,10 @@ const generateOtp = require('../utils/otpGenerator');
 const { userOtp } = require('../utils/email_templates/userOtp');
 const { adminRequest } = require('../utils/email_templates/adminRequest');
 const { requestToSuperadmin } = require('../utils/email_templates/requestToSuperadmin');
+const { transporterConfig } = require('../utils/email_templates/transporterConfig');
 
 // Nodemailer
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.GMAIL_ID,
-        pass: process.env.GMAIL_KEYPASS,
-    },
-});
+const transporter = nodemailer.createTransport(transporterConfig());
 
 // Request for an Admin
 exports.requestForAdmin = async (req, res) => {

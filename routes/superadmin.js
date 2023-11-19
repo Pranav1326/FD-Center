@@ -5,6 +5,9 @@ const auth = require('../middlewares/auth');
 // login
 router.post('/signin', superAdminController.login);
 
+// get mails
+router.get('/getmails', superAdminController.getEmail);
+
 // All Admins List
 router.get('/admin/:adminId', auth, superAdminController.getSingleAdmin);
 

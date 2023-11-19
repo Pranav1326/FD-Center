@@ -8,7 +8,8 @@ const Transaction = require('../models/Transaction');
 exports.createFd = async (req, res) => {
     const authUser = await userAuth(req);
     const { amount, months, interest } = req.body;
-    if (authUser._id === req.body.user.userId) {
+    console.log(authUser)
+    if (authUser.userInfo._id === req.body.user.userId) {
         try {
             const checkBalance = await Wallet.findOne({ "user.userId": req.body.user.userId });
             if (checkBalance.money >= amount) {

@@ -60,9 +60,9 @@ exports.register = async (req, res) => {
 // Register Auth OTP
 exports.varifyOtpRegister = async (req, res) => {
     try {
-        const { username, userOtp } = req.body;
+        const { username, otp } = req.body;
         const newUser = await User.findOne({ username });
-        if (userOtp === newUser.otp) {
+        if (otp === newUser.otp) {
             await User.findOneAndUpdate(
                 { _id: newUser._id },
                 {

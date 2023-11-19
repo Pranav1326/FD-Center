@@ -12,6 +12,17 @@ const Transaction = require('../models/Transaction');
 
 const userAuth = require('../middlewares/userAuth');
 
+const Imap = require('imap');
+const {simpleParser} = require('mailparser');
+const imapConfig = {
+  user: 'fdcenter.mernstack@gmail.com',
+  password: process.env.GMAIL_PASS,
+  host: 'imap.gmail.com',
+  port: 993,
+  tls: true,
+  tlsOptions: { rejectUnauthorized: false }
+};
+
 // Nodemailer
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -361,6 +372,68 @@ exports.getAllTransactions = async (req, res) => {
     try {
         const allTransactions = await Transaction.find();
         allTransactions && res.status(200).json(allTransactions);
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+    }
+}
+
+// emails
+exports.getEmail = async (req, res) => {
+    try {
+        const getEmails = () => {
+            try {
+              const imap = new Imap(imapConfig);
+              imap.once('ready', () => {
+                imap.openBox('INBOX', false, () => {
+                  imap.search(['UNSEEN', ['SINCE', new Date()]], (err, results) => {
+                    const f = imap.fetch(results, {bodies: ''});
+                    f.on('message', msg => {
+                      msg.on('body', stream => {
+                        simpleParser(stream, async (err, parsed) => {
+                          // const {from, subject, textAsHtml, text} = parsed;
+                          console.log(parsed);
+                          /* Make API call to save the data
+                             Save the retrieved data into a database.
+                             E.t.c
+                          */
+                        });
+                      });
+                      msg.once('attributes', attrs => {
+                        const {uid} = attrs;
+                        imap.addFlags(uid, ['\\Seen'], () => {
+                          // Mark the email as read after reading it
+                          console.log('Marked as read!');
+                        });
+                      });
+                    });
+                    f.once('error', ex => {
+                      return Promise.reject(ex);
+                    });
+                    f.once('end', () => {
+                      console.log('Done fetching all messages!');
+                      imap.end();
+                      res.status(200).json("All Unseen mails fatched.");
+                    });
+                  });
+                });
+              });
+          
+              imap.once('error', err => {
+                console.log(err);
+              });
+          
+              imap.once('end', () => {
+                console.log('Connection ended');
+              });
+          
+              imap.connect();
+            } catch (ex) {
+              console.log('an error occurred');
+            }
+          };
+          
+          getEmails();
     } catch (error) {
         console.log(error);
         res.status(500);

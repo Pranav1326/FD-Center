@@ -14,6 +14,10 @@ const userAuth = require('../middlewares/userAuth');
 
 const Imap = require('imap');
 const {simpleParser} = require('mailparser');
+const { adminApproved } = require('../utils/email_templates/adminApproved');
+const { adminRejected } = require('../utils/email_templates/adminRejected');
+const { adminDisabled } = require('../utils/email_templates/adminDisabled');
+const { adminEnabled } = require('../utils/email_templates/adminEnabled');
 
 const imapConfig = {
   user: process.env.GMAIL_ID,
@@ -107,29 +111,7 @@ exports.approveAdmin = async (req, res) => {
                                 { new: true }
                             );
                             await updatedAdmin.save();
-                            // E-mail goes to Requested User
-                            let responseMail = await transporter.sendMail({
-                                from: 'fdcenter.mernstack@gmail.com',
-                                to: `${doc.user.email}`,
-                                subject: "Response for Admin Request in FD Center",
-                                html: `
-                                    <p>Hello ${doc.user.username},</p>
-                                    <br/>
-                                    <p>Congratulations! Your request to become an Admin at FD Center has been approved by the FD Center team. You now have access to the FD Center system.</p>
-                                    <p><strong>Admin Details:</strong></p>
-                                    <ul>
-                                        <li>Username: ${updatedAdmin.username}</li>
-                                        <li>Email: ${"Admin@fdcenter"}</li>
-                                    </ul>
-                                    <br/>
-                                    <p>As an Admin, it is now your responsibility to manage interest rates and ensure a positive user experience for FD Center users.</p>
-                                    <br/>
-                                    <p>If you have any questions or concerns, please don't hesitate to reach out to fdcenter.mernstack@gmail.com.</p>
-                                    <br/>
-                                    <p>Regards</p>
-                                    <p><strong>Team FD-Center</strong></p>
-                                `
-                            });
+                            let responseMail = await transporter.sendMail(adminApproved(doc.user.email, doc.user.username, updatedAdmin.username));
                             (doc && responseMail) && res.status(200).json("Request Approved!");
                         })
                         .catch(err => {
@@ -169,22 +151,7 @@ exports.rejectAdmin = async (req, res) => {
                         { new: true },
                         )
                         .then(async (doc) => {
-                            // E-mail goes to Requested User
-                            let responseMail = await transporter.sendMail({
-                                from: 'fdcenter.mernstack@gmail.com',
-                                to: `${doc.user.email}`,
-                                subject: "Response for Admin Request in FD Center",
-                                html: `
-                                    <p>Hello ${doc.user.username},</p>
-                                    <br/>
-                                    <p>We regret to inform you that your request to become an Admin at FD Center has been rejected by the FD Center team.</p>
-                                    <br/>
-                                    <p>If you have any questions or concerns regarding the rejection, please feel free to reach out to fdcenter.mernstack@gmail.com.</p>
-                                    <br/>
-                                    <p>Best Regards,</p>
-                                    <p><strong>Team FD-Center</strong></p>                                
-                                `
-                            });
+                            let responseMail = await transporter.sendMail(adminRejected(doc.user.email, doc.user.username));
                             (doc && responseMail) && res.status(200).json("Request Rejected!");
                         })
                         .catch(err => {
@@ -227,21 +194,7 @@ exports.disableAdmin = async (req, res) => {
                         { new: true }
                     )
                     .then(async (doc) => {
-                        let responseMail = await transporter.sendMail({
-                            from: 'fdcenter.mernstack@gmail.com',
-                            to: `${doc.email}`,
-                            subject: "Admin account deactivaiton in FD Center",
-                            html: `
-                                <p>Hello ${doc.username},</p>
-                                <br/>
-                                <p>This is to inform you that you account in FD Center as an Admin has been Disabled by Superadmin.</p>
-                                <br/>
-                                <p>If you have any questions or concerns regarding the rejection, please feel free to reach out to fdcenter.mernstack@gmail.com.</p>
-                                <br/>
-                                <p>Regards,</p>
-                                <p><strong>Team FD-Center</strong></p>                                
-                            `
-                        });
+                        let responseMail = await transporter.sendMail(adminDisabled(doc.email, doc.username));
                         (doc && responseMail) && res.status(200).json(`Admin ${doc.username} Disabled!`);
                     })
                     .catch(err => {
@@ -284,21 +237,7 @@ exports.enableAdmin = async (req, res) => {
                         { new: true }
                     )
                     .then(async (doc) => {
-                        let responseMail = await transporter.sendMail({
-                            from: 'fdcenter.mernstack@gmail.com',
-                            to: `${doc.email}`,
-                            subject: "Admin account reactivaiton in FD Center",
-                            html: `
-                                <p>Hello ${doc.username},</p>
-                                <br/>
-                                <p>This is to inform you that you account in FD Center as an Admin has been Enabled by Superadmin.</p>
-                                <br/>
-                                <p>If you have any questions or concerns regarding the rejection, please feel free to reach out to fdcenter.mernstack@gmail.com.</p>
-                                <br/>
-                                <p>Regards,</p>
-                                <p><strong>Team FD-Center</strong></p>                                
-                            `
-                        });
+                        let responseMail = await transporter.sendMail(adminEnabled(doc.email, doc.username));
                         (doc && responseMail) && res.status(200).json(`Admin ${doc.username} Enabled!`);
                     })
                     .catch(err => {

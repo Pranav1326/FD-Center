@@ -71,7 +71,7 @@ exports.requestForAdmin = async (req, res) => {
 exports.register = async (req, res) => {
     try {
         const { username, email } = req.body;
-        const isAdminExist = await Admin.findOne({ username });
+        const isAdminExist = await Admin.findOne({ username: `admin.${username}` });
         const adminWithSameEmail = await Admin.findOne({ email });
         if (adminWithSameEmail) {
             res.status(403).json("Email exists! Please provide different email.");
@@ -81,7 +81,7 @@ exports.register = async (req, res) => {
         }
         if (!adminWithSameEmail && !isAdminExist) {
             const newAdmin = new Admin({
-                username: username,
+                username: `admin.${username}`,
                 email: email,
                 otp: generateOtp(),
                 active: false,
@@ -103,7 +103,6 @@ exports.login = async (req, res) => {
     try {
         const admin = await Admin.findOne({ username: req.body.username });
         !admin && res.status(404).json('Admin does not exist!');
-
         if(admin){
             if(!admin.validated){
                 res.status(400).json("Please validate your account!");
@@ -112,16 +111,16 @@ exports.login = async (req, res) => {
                 res.status(400).json("Your account has not been activated yet!");
             }
             else{
-                const validated = await bcrypt.compare(req.body.password, admin.password);
-                !validated && res.status(400).json('Wrong credentials!');
+                const passwordValidated = await bcrypt.compare(req.body.password, admin.password);
+                !passwordValidated && res.status(400).json('Wrong credentials!');
                 
                 // Destructuring Admin object fatched from db
-                const { password, ...adminInfo } = admin._doc;
+                const { password, active, adminStatus, otp, validated, ...adminInfo } = admin._doc;
                 const token = jwt.sign(
                     adminInfo,
                     process.env.TOKEN_PASS
                 );
-                token && res.status(200).json({ token });
+                token && res.status(200).json({ token, userType: 1 });
             }
         }
     } catch (error) {

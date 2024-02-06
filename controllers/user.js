@@ -106,7 +106,7 @@ exports.login = async (req, res) => {
                     { userInfo, walletDetails, FdDetails },
                     process.env.TOKEN_PASS
                 );
-                token && res.status(200).json({ token });
+                token && res.status(200).json({ token, userType: 2 });
             }
         }
     } catch (error) {

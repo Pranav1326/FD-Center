@@ -46,10 +46,10 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             adminInfo,
             process.env.TOKEN_PASS,
-            { expiresIn: '2h' }
+            { expiresIn: '1h' }
         );
 
-        token && res.status(200).json({ token });
+        token && res.status(200).json({ token, userType: 0 });
     } catch (error) {
         console.log(error);
         res.status(500);
@@ -95,7 +95,7 @@ exports.approveAdmin = async (req, res) => {
                                 { _id: doc.user.userId },
                                 {
                                     $set: { 
-                                        username: "admin."+doc.user.username,
+                                        username: doc.user.username,
                                         password: hashedPassword,
                                         active: true,
                                         adminStatus: "permanent"

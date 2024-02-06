@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const swaggerFile = require('./swagger-output.json');
 
 const app = express();
 app.use(express.json());
@@ -20,25 +22,42 @@ const transactionRoute = require('./routes/transaction');
 const superAdminRoute = require('./routes/superadmin');
 
 // User Routes
-app.use('/api/user', userRoute);
+app.use('/api/user', userRoute
+// #swagger.tags = ["User"]
+);
 
 // Wallet Routes
-app.use('/api/wallet', walletRoute);
+app.use('/api/wallet', walletRoute
+// #swagger.tags = ["Wallet"]
+);
 
 // FD Routes
-app.use('/api/fd', fdRoute);
+app.use('/api/fd', fdRoute
+// #swagger.tags = ["Fd"]
+);
 
 // Admin Routes
-app.use('/api/admin', adminRoute);
+app.use('/api/admin', adminRoute
+// #swagger.tags = ["Admin"]
+);
 
 // Superadmin Routes
-app.use('/api/superadmin', superAdminRoute);
+app.use('/api/superadmin', superAdminRoute
+// #swagger.tags = ["SuperAdmin"]
+);
 
 // Admin Routes
-app.use('/api/rate', rateRoute);
+app.use('/api/rate', rateRoute
+// #swagger.tags = ["Rate"]
+);
 
 // Transaction Routes
-app.use('/api/transaction', transactionRoute);
+app.use('/api/transaction', transactionRoute
+// #swagger.tags = ["Transaction"]
+);
+
+// Documentation
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.listen(PORT, () => {
     console.log(`Server started on http://localhost:${PORT}`);

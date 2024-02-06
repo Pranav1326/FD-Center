@@ -14,9 +14,10 @@ exports.adminApproved = (receiver, username, adminName) => {
                     <p><strong>Admin Details:</strong></p>
                     <ul>
                         <li>Username: ${adminName}</li>
-                        <li>Email: ${"Admin@fdcenter"}</li>
+                        <li>Password: ${"Admin@fdcenter"}</li>
                     </ul>
                     <br/>
+                    <p><i>Note: This is a system generated password please change it, otherwise the security of your account may be comprimised!</i></p>
                     <p>As an Admin, it is now your responsibility to manage interest rates and ensure a positive user experience for FD Center users.</p>
                     <br/>
                     <p>If you have any questions or concerns, please don't hesitate to reach out to fdcenter.mernstack@gmail.com.</p>

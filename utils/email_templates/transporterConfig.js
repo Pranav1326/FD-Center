@@ -5,7 +5,7 @@ exports.transporterConfig = () => {
         secure: true,
         auth: {
             user: process.env.GMAIL_ID,
-            pass: process.env.GMAIL_KEYPASS,
+            pass: process.env.GMAIL_PASS,
         }
     }
 }

@@ -17,6 +17,10 @@ router.post('/signin', adminController.login
 // #swagger.description = "Admin login"
 );
 
+router.get('/getcenterdata', auth, adminController.getCenterData
+// #swagger.description = "Get all data about fd and revenue"
+);
+
 // Get All FDs
 router.get('/getallfds', auth, adminController.getAllFds
 // #swagger.description = "Get all Fds"

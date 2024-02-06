@@ -211,3 +211,27 @@ exports.getAllFds = async (req, res) => {
         console.log(error);
     }
 }
+
+// Get Center data (total fds, revenue etc)
+exports.getCenterData = async (req, res) => {
+    try {
+        const allFds = await Fd.find();
+        var totalRev=0;
+        var runningRev = 0;
+        var maturedRev = 0;
+        var brokenRev = 0;
+        allFds.forEach(fd => {
+            totalRev += fd.amount;
+            if(fd.status === "running") runningRev++;
+            if(fd.status === "matured") maturedRev++;
+            if(fd.status === "broken") brokenRev++;
+        });
+
+        const centerData = { totalFds: allFds.length, revenue: totalRev, runningFds: runningRev, maturedFds: maturedRev, brokenFds: brokenRev };
+
+        res.status(200).json({ centerData });
+    } catch (error) {
+        res.status(500);
+        console.log(error);
+    }
+}

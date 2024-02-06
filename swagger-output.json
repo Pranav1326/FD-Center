@@ -643,6 +643,32 @@
         }
       }
     },
+    "/api/admin/getcenterdata": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "Get all data about fd and revenue",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/admin/getallfds": {
       "get": {
         "tags": [

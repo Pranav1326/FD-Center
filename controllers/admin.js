@@ -76,7 +76,7 @@ exports.register = async (req, res) => {
         if (adminWithSameEmail) {
             res.status(403).json("Email exists! Please provide different email.");
         }
-        if (isAdminExist) {
+        else if (isAdminExist) {
             res.status(400).json("Admin already exist! Please Login.");
         }
         if (!adminWithSameEmail && !isAdminExist) {
@@ -108,7 +108,7 @@ exports.login = async (req, res) => {
             if(!admin.validated){
                 res.status(400).json("Please validate your account!");
             }
-            if(admin.adminStatus !== "permanent"){
+            else if(admin.adminStatus !== "permanent"){
                 res.status(400).json("Your account has not been activated yet!");
             }
             else{

@@ -161,11 +161,19 @@ exports.updateRate = async (req, res) => {
     if (authUser._id === req.body.userId && req.body.rateId === req.params.rateId) {
         try {
             const updatedRate = await Rate.findOneAndUpdate(
-                {_id: req.params.rateId},
-                {interestRate: req.body.interestRate},
-                {new: true}    
+                { _id: req.params.rateId },
+                {
+                    $set: {
+                        interestRate: req.body.interestRate,
+                        updatedBy: {
+                            adminId: authUser._id,
+                            admin: authUser.username
+                        }
+                    }
+                },
+                { new: true }
             );
-            updatedRate && res.status(200).json(updatedRate);
+            updatedRate && res.status(200).json("Rate Updated!");
         } catch (error) {
             console.log(error);
             res.status(500);
@@ -184,7 +192,7 @@ exports.deleteRate = async (req, res) => {
             const rate = await Rate.findOne({_id: req.params.rateId});
             if(rate){
                 const updatedRate = await Rate.findOneAndDelete(
-                    {_id: req.params.rateId}
+                    { _id: req.params.rateId }
                 );
                 updatedRate && res.status(200).json("Rate Deleted!");
             }

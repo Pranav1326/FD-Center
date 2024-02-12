@@ -218,7 +218,7 @@ exports.getAllFds = async (req, res) => {
     const pages = Math.ceil(total / pageSize);
     try {
         const allFds = await Fd.find().sort({ createdAt: -1 }).limit(pageSize).skip(skip);
-        allFds && res.status(200).json(allFds);
+        allFds && res.status(200).json({ page, pages, allFds });
     } catch (error) {
         res.status(500);
         console.log(error);

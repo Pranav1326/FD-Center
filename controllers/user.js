@@ -98,6 +98,7 @@ exports.login = async (req, res) => {
             else{
                 const validated = await bcrypt.compare(req.body.password, user.password);
                 !validated && res.status(400).json('Wrong credentials!');
+                next();
 
                 const walletDetails = await Wallet.findOne({ "user.userId": user._id });
                 const FdDetails = await Fd.find({ "user.userId": user._id });

@@ -8,7 +8,6 @@ const Transaction = require('../models/Transaction');
 exports.createFd = async (req, res) => {
     const authUser = await userAuth(req);
     const { amount, months, interest } = req.body;
-    console.log(authUser)
     if (authUser.userInfo._id === req.body.user.userId) {
         try {
             const checkBalance = await Wallet.findOne({ "user.userId": req.body.user.userId });
@@ -33,7 +32,7 @@ exports.createFd = async (req, res) => {
                     amount: amount
                 });
                 await newTransaction.save();
-                newFd && res.status(200).json(newFd);
+                newFd && res.status(200).json("Fd created!");
             }
             else {
                 res.status(400).json("Insufficient balance!");
@@ -86,7 +85,7 @@ exports.breakFd = async (req, res) => {
 exports.getAllFdsOfUser = async (req, res) => {
     const userId = req.params.userId;
     const authUser = await userAuth(req);
-    if (authUser._id === userId) {
+    if (authUser.userInfo._id === userId) {
         try {
             const allFds = await Fd.find({ "user.userId": userId });
             allFds && res.status(200).json(allFds);

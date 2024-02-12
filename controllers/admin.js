@@ -211,8 +211,13 @@ exports.deleteRate = async (req, res) => {
 
 // Get All FDs
 exports.getAllFds = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 5;
+    const skip = (page - 1) * pageSize;
+    const total = await Fd.countDocuments();
+    const pages = Math.ceil(total / pageSize);
     try {
-        const allFds = await Fd.find();
+        const allFds = await Fd.find().sort({ createdAt: -1 }).limit(pageSize).skip(skip);
         allFds && res.status(200).json(allFds);
     } catch (error) {
         res.status(500);

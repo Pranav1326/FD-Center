@@ -144,7 +144,7 @@ exports.createRate = async (req, res) => {
                 }
             });
             await newRate.save();
-            newRate && res.status(200).json(newRate);
+            newRate && res.status(200).json("New Rate Created");
         } catch (error) {
             console.log(error);
             res.status(500);

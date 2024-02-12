@@ -20,7 +20,7 @@ exports.greetingUser = (receiver, username) => {
                     <p>
                         <i>
                             <strong>Note:</strong>
-                            This is a prototype website and does not involve any trancasction with real money. FD-Center will not responsible for any transaction that includes real money. The money and transactions shown in this website are totally virtual.
+                            This is a prototype website and does not involve any trancasction with real money. FD-Center does not responsible for any transaction that includes any real money. The money and transactions shown in this website are totally virtual. Also keep in mind that FD-Center will not take or save your any information of your credit-card. So you can enter any details for card section.
                         </i>
                     </p>
                     <br>

@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
+const cron = require('node-cron');
 
 const app = express();
 app.use(express.json());
@@ -11,6 +12,15 @@ app.use(cors());
 
 // Database Connection
 const db = require('./utils/db');
+
+// Fd maturity check
+const {checkMaturedDeposits} = require('./utils/fdChecker');
+
+cron.schedule('0 0 * * *', () => {
+    checkMaturedDeposits();
+}, {
+    timezone: 'Asia/Kolkata'
+});
 
 // Routes
 const userRoute = require('./routes/user');

@@ -17,7 +17,7 @@ const walletSchema = new mongoose.Schema({
         required: true,
         default: 0,
         min: 0,
-        max: 10000000
+        max: 100000000
     },
 }, { timestamps: true });
 

@@ -260,7 +260,7 @@ exports.enableAdmin = async (req, res) => {
 exports.allAdminList = async (req, res) => {
     try {
         const adminList = await Admin.find();
-        doc && res.status(200).json(adminList);
+        adminList && res.status(200).json(adminList);
     } catch (error) {
         console.log(error);
         res.status(500);

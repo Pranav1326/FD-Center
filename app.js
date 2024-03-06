@@ -6,7 +6,7 @@ const cron = require('node-cron');
 
 const app = express();
 app.use(express.json());
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
 
 app.use(cors());
 

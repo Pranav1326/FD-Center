@@ -1,9 +1,10 @@
-const  User =  require('../models/User');
-
 const nodemailer = require('nodemailer');
 
+const  User =  require('../models/User');
+const Transaction = require('../models/Transaction');
 const Fd = require('../models/Fd');
 const Wallet = require('../models/Wallet');
+
 const { fdMatured } = require('./email_templates/fdMatured');
 const { transporterConfig } = require('./email_templates/transporterConfig');
 
@@ -27,6 +28,16 @@ exports.checkMaturedDeposits = async () => {
                 { new: true }
             );
             const user = await User.findOne({ _id: "fd.user.userId" });
+            const newTransactionMatureFd = new Transaction({
+                user: {
+                    userId: user._id,
+                    username: user.username
+                },
+                transaction: "mature fd",
+                amount: updateFdStatus.maturityValue
+            });
+            newTransactionMatureFd.save();
+            
             user && await transporter.sendMail(fdMatured(user.email, user.username));
         }
         else{

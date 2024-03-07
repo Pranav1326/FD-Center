@@ -13,13 +13,23 @@ let transporter = nodemailer.createTransport(transporterConfig());
 
 exports.checkMaturedDeposits = async () => {
     const fds = await Fd.find({ status: "running" });
+    // console.log(fds);
     const maturedFds = fds.map( async (fd) => {
-        if(new Date() > fd.matureDate){
-            const updateFdStatus = Fd.findOneAndUpdate(
+        function isMature(currentDate, matureDate) {
+            if(currentDate.getFullYear() === matureDate.getFullYear() && currentDate.getMonth() === matureDate.getMonth() && currentDate.getDate() === matureDate.getDate()){
+                return true;
+            }
+            return false;
+        }
+        if(isMature(new Date(), new Date(fd.matureDate))){
+            const updateFdStatus = await Fd.findOneAndUpdate(
                 { _id: fd._id},
-                { status : "matured" },
+                {
+                    $set: { status: "matured" },
+                },
                 { new: true }
             );
+            updateFdStatus && console.log(updateFdStatus);
             await Wallet.findOne(
                 { "user.userId": "fd.user.userId" },
                 {

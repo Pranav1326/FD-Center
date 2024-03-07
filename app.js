@@ -16,7 +16,8 @@ const db = require('./utils/db');
 // Fd maturity check
 const {checkMaturedDeposits} = require('./utils/fdChecker');
 
-cron.schedule('0 0 * * *', () => {
+cron.schedule('* * * * *', () => {
+    console.log("Cron job executed!");
     checkMaturedDeposits();
 }, {
     timezone: 'Asia/Kolkata'

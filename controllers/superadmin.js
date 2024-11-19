@@ -58,13 +58,18 @@ exports.login = async (req, res) => {
 
 // Get All the Requests for an Admin
 exports.getAllAdminRequests = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 5;
+    const skip = (page - 1) * pageSize;
+    const total = await Fd.countDocuments();
+    const pages = Math.ceil(total / pageSize);
     try {
         const authUser = await userAuth(req);
         if(authUser._id === process.env.SUPERADMIN_ID){
             const adminRequests = await AdminRequest.find();
 
             !adminRequests && res.status(404).json("No requests found!");
-            adminRequests && res.status(200).json(adminRequests);
+            adminRequests && res.status(200).json({ page, pages, adminRequests });
         }
         else{
             res.status(401).json("Not Authorized!");
@@ -258,9 +263,14 @@ exports.enableAdmin = async (req, res) => {
 
 // All Admins List
 exports.allAdminList = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 5;
+    const skip = (page - 1) * pageSize;
+    const total = await Fd.countDocuments();
+    const pages = Math.ceil(total / pageSize);
     try {
-        const adminList = await Admin.find();
-        adminList && res.status(200).json(adminList);
+        const adminList = await Admin.find().sort({ createdAt: -1 }).limit(pageSize).skip(skip);
+        adminList && res.status(200).json({ page, pages, adminList });
     } catch (error) {
         console.log(error);
         res.status(500);
@@ -280,20 +290,30 @@ exports.getSingleAdmin = async (req, res) => {
 
 // Get All FDs
 exports.getAllFds = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 5;
+    const skip = (page - 1) * pageSize;
+    const total = await Fd.countDocuments();
+    const pages = Math.ceil(total / pageSize);
     try {
-        const allFds = await Fd.find();
-        allFds && res.status(200).json(allFds);
+        const allFds = await Fd.find().sort({ createdAt: -1 }).limit(pageSize).skip(skip);
+        allFds && res.status(200).json({ page, pages, allFds });
     } catch (error) {
-        console.log(error);
         res.status(500);
+        console.log(error);
     }
 }
 
 // Get All Users
 exports.getAllUsers = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 5;
+    const skip = (page - 1) * pageSize;
+    const total = await Fd.countDocuments();
+    const pages = Math.ceil(total / pageSize);
     try {
-        const allUsers = await User.find();
-        allUsers && res.status(200).json(allUsers);
+        const allUsers = await User.find().sort({ createdAt: -1 }).limit(pageSize).skip(skip);
+        allUsers && res.status(200).json({ page, pages, allUsers });
     } catch (error) {
         console.log(error);
         res.status(500);
@@ -302,9 +322,14 @@ exports.getAllUsers = async (req, res) => {
 
 // Get All Transactions
 exports.getAllTransactions = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 5;
+    const skip = (page - 1) * pageSize;
+    const total = await Fd.countDocuments();
+    const pages = Math.ceil(total / pageSize);
     try {
-        const allTransactions = await Transaction.find();
-        allTransactions && res.status(200).json(allTransactions);
+        const allTransactions = await Transaction.find().sort({ createdAt: -1 }).limit(pageSize).skip(skip);
+        allTransactions && res.status(200).json({ page, pages, allTransactions });
     } catch (error) {
         console.log(error);
         res.status(500);

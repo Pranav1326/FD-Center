@@ -6,6 +6,7 @@ const cron = require('node-cron');
 
 const app = express();
 app.use(express.json());
+
 const PORT = process.env.PORT || 5050;
 
 app.use(cors());
@@ -17,7 +18,7 @@ const db = require('./utils/db');
 const {checkMaturedDeposits} = require('./utils/fdChecker');
 
 cron.schedule('0 0 * * *', () => {
-    console.log("Cron job executed!");
+    console.log("Cron job executed on " + new Date());
     checkMaturedDeposits();
 }, {
     timezone: 'Asia/Kolkata'

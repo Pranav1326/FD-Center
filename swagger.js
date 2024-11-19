@@ -42,7 +42,7 @@ const doc = {
     ],
     securityDefinitions: {},
     definitions: {}
-  };
+};
 
 const outputFile = "./swagger-output.json";
 const endPointsFile = ["./app.js"];

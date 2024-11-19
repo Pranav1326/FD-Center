@@ -10,7 +10,7 @@ exports.deposit = async (req, res) => {
     if (authUser.userInfo._id === userId) {
         try {
             const checkWallet = await Wallet.findOne({ "user.userId": userId });
-            if (checkWallet.money+depositAmount <= 1000000) {
+            if (depositAmount <= 1000000) {
                 const updateWallet = await Wallet.updateOne({ "user.userId": userId }, {
                     $inc: { money: depositAmount }
                 }).then(data => {
